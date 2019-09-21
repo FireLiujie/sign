@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <meta http-equiv="Access-Control-Allow-Origin" content="*" />
+    <meta http-equiv="Content-Type" content="textml; charset=UTF-8" />
+    <meta http-equiv="x-dns-prefetch-control" content="on" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta content="telephone=no" name="format-detection" />
+    <meta name="full-screen" content="yes" />
+    <meta name="x5-fullscreen" content="true" />
+    <title>申请人签字</title>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      eruda.init();
+    </script>
+    <script src="./js/anysignWebInterface.js"></script>
+    <link rel="stylesheet" href="./css/sign.css" />
+    <script>
+      var apiInstance;
+      var fileData;
+      var ocrCapture;
+
+      /*识别回调错误码*/
+      var DATA_CANNOT_PARSED = "10003"; //输入数据项无法解析
+      var SERVICE_SYSTEM_EXCEPTION = "10011"; //服务系统异常错误
+      var RECOGNITION_RESULT_EMPTY = "10100"; //识别结果为空
+      var CONNECTION_SERVICE_TIMEOUT = "10101"; //连接识别服务超时
+      var CONNECTION_RECOGNITION_EXCEPTION = "10102"; //连接识别服务异常
+      var SUCCESS = "0"; //识别成功
+      var RECOGNITION_FALSE = "-1"; //识别错误
+
+      /*签名回调识别码*/
+      var RESULT_OK = 0; //操作成功
+      var CALLBACK_TYPE_SIGNATURE = 10; //签名框点击确认之后的回调，回调中包含签名快照
+      var CALLBACK_TYPE_DIALOG_CANCEL = 11; //点击签名框"取消"按钮时的回调，同时也会触发dismiss回调
+      var CALLBACK_TYPE_COMMENTSIGN = 12; //批注签名框点击确认之后的回调，回调中包含签名快照
+      var CALLBACK_TYPE_GETVERSION = 13; //获得版本号
+      var RESULT_ERROR = -1; //操作失败
+      var EC_API_NOT_INITED = 1; //接口未初始化错误
+
+      //添加单签签名框
+      function testAddSignatureObj(objId) {
+        var signInfo = JSON.parse(localStorage.getItem("signInfo"));
+        var signOffset = signInfo.offset;
+        var signName = signInfo.name;
+        var idNo = signInfo.idNo;
+        var keyword = signInfo.keyword;
+        // var signOffset = '50'
+        // var signName = '刘杰';
+        // var idNo = '429001199008170412';
+        // var keyword = '法定监护人';
+        var context_id = objId;
+        console.log("·····························");
+        console.log("signName:" + signName);
+        console.log("idNo:" + idNo);
+        console.log("keyword:" + keyword);
+        console.log("signOffset:" + signOffset);
+        // var signer = new Signer("刘杰", "429001199008170412");
+        var signer = new Signer(signName, idNo);
+        /**
+         * 关键字定位方式，寻找PDF中的关键字，根据关键字位置放置签名图片
+         * @param keyword 关键字
+         * @param keyWordAlignMethod 签字图片和关键字位置关系：等于1时，签字图片和关键字矩形重心重合
+         *                            等于2时，签字图片位于关键字正下方，中心线对齐；等于3时，签字图片位于关键字正右方，中心线对齐；
+         *                            等于4时，签字图片左上角和关键字右下角重合，可能额外附加偏移量，详见构造函数的offset参数
+         * @param keyWordOffset 当keyWordAlignMethod非零时，额外附加的偏移量，单位pt
+         * @param pageNo 寻找关键字的PDF起始页码
+         * @param KWIndex KWIndex 第几个关键字
+         * @constructor
+         */
+        var signerRule = new SignRule_KeyWord(
+          keyword,
+          3,
+          Number(signOffset),
+          1,
+          1
+        );
+        var signatureConfig = new SignatureConfig(signer, signerRule);
+        console.log(signatureConfig);
+        var res = apiInstance.addSignatureObj(context_id, signatureConfig);
+        return res;
+      }
+
+      function setIdentifyCallBack(callback) {
+        if (!apiInstance) {
+          alert("信手书接口没有初始化");
+          return;
+        }
+        apiInstance.setIdentifyCallBack(callback);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="kong"></div>
+    <div id="autographInit">
+      <form id="signForm">
+        <center>
+          <div id="dialog">
+            <!-- 显示签名区域-->
+            <div id="anysign_title" style="display: none">
+              请申请人测试签字
+            </div>
+            <div id="container" onclick="return false;" class="hs">
+              <!-- <canvas id="anysignCanvas" height="240" width="600"></canvas> -->
+              <canvas id="anysignCanvas" height="1" width="1"></canvas>
+            </div>
+            <div id="single_scrollbar">
+              <input
+                id="single_scrollbar_down"
+                type="button"
+                class="button orange"
+                value="左移"
+              />
+              <input
+                id="single_scrollbar_up"
+                type="button"
+                class="button orange"
+                value="右移"
+              />
+            </div>
+            <div id="btnContainerOuter" style="width: 100%;">
+              <div
+                id="btnContainerInner"
+                style="text-align: center;font-size:5pt;"
+                width="100%"
+              >
+                <div class="img-wrap">
+                  <div class="img-box">
+                    <img
+                      id="btnOk"
+                      onclick="javascript:sign_confirm();"
+                      src="./img/btnOk.png"
+                    />
+                  </div>
+                </div>
+                <div class="img-wrap">
+                  <div class="img-box">
+                    <img
+                      id="btnClear"
+                      onclick="javascript:clear_canvas();"
+                      src="./img/btnClear.png"
+                    />
+                  </div>
+                </div>
+                <div class="img-wrap">
+                  <div class="img-box">
+                    <img
+                      id="btnCancel"
+                      onclick="javascript:cancelSign();"
+                      src="./img/btnCancel.png"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            style="width:300px!important; height:240px!important;vertical-align:middle; border: 1px solid #D3D3D3;margin-top: 50px;"
+          >
+            <img id="xss_20" class="xss_20" />
+          </div>
+          <textarea id="result" rows="10" style="display: none;"></textarea>
+          <textarea
+            id="imgBase64Data"
+            rows="10"
+            name="imgBase64Data"
+            style="display: none;"
+          ></textarea>
+        </center>
+        <div id="msk"></div>
+      </form>
+    </div>
+    <script src="./js/autograph.js"></script>
+  </body>
+</html>
