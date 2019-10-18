@@ -94,9 +94,67 @@ function sign_submit() {
   var signInfo = JSON.parse(localStorage.getItem("signInfo"));
   var originUrl = signInfo.originUrl;
   var imgBase64Data = $("#imgBase64Data").val();
-  sessionStorage.setItem("imgBase64Data", imgBase64Data);
-  sessionStorage.setItem("wxSigned", true);
-  window.open(originUrl + "/#/sale/SignatureOfElectronic", "_self");
+  var originStatus = signInfo.originStatus;
+  var attachmentShow = localStorage.getItem("attachmentShow");
+  var signVal = localStorage.getItem("sign-val");
+  if (originStatus == "1") {
+    var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
+    appntSignList.forEach(item => {
+      if (item.documentType == "3") {
+        item.baseEncryp = imgBase64Data;
+        item.isSign = true;
+        item.base64 = imgBase64Data
+      }
+    });
+    localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
+  } else if (originStatus == "2") {
+    var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
+    var riskCode = signInfo.riskCode;
+    appntSignList.forEach(item => {
+      if (item.riskCode == riskCode) {
+        item.baseEncryp = imgBase64Data;
+        item.isSign = true;
+        item.base64 = imgBase64Data
+      }
+    });
+    localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
+  } else if (originStatus == "3") {
+    if (attachmentShow == "0") {
+      var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
+      var insuredSign = JSON.parse(localStorage.getItem("sign-insured"));
+      if (signVal == "0" || signVal == "2") {
+        appntSignList.forEach(item => {
+          if (item.documentType == "1") {
+            item.baseEncryp = imgBase64Data;
+            item.isSign = true;
+          }
+        });
+        localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
+      } else {
+        insuredSign.sign.baseEncryp = imgBase64Data;
+        insuredSign.sign.isSign = true;
+        localStorage.setItem("sign-insured", JSON.stringify(insuredSign));
+      }
+    } else {
+      var appntSign = JSON.parse(localStorage.getItem("sign-appnt"));
+      var insuredSign = JSON.parse(localStorage.getItem("sign-insured"));
+      if (signVal == "0" || signVal == "2") {
+        appntSign.sign.baseEncryp = imgBase64Data;
+        appntSign.sign.isSign = true;
+        localStorage.setItem("sign-appnt", JSON.stringify(appntSign));
+      } else {
+        insuredSign.sign.baseEncryp = imgBase64Data;
+        insuredSign.sign.isSign = true;
+        localStorage.setItem("sign-insured", JSON.stringify(insuredSign));
+      }
+    }
+    sessionStorage.setItem("wxSigned", true);
+  } else if (originStatus == "4") {
+    sessionStorage.setItem("imgBase64Data", imgBase64Data);
+    sessionStorage.setItem("wxSigned", true);
+  }
+  location.href = originUrl;
+
 }
 function testGenData() {
   var res = document.getElementById("result");
@@ -113,8 +171,7 @@ function testGenData() {
 }
 
 function cancelSign() {
-  console.log("我取消了··");
   var signInfo = JSON.parse(localStorage.getItem("signInfo"));
   var originUrl = signInfo.originUrl;
-  window.open(originUrl + "/#/sale/SignatureOfElectronic", "_self");
+  location.href = originUrl;
 }
