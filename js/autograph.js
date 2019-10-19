@@ -97,13 +97,14 @@ function sign_submit() {
   var originStatus = signInfo.originStatus;
   var attachmentShow = localStorage.getItem("attachmentShow");
   var signVal = localStorage.getItem("sign-val");
+  var base64Show = $('#xss_20').attr('src')
   if (originStatus == "1") {
     var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
     appntSignList.forEach(item => {
       if (item.documentType == "3") {
         item.baseEncryp = imgBase64Data;
         item.isSign = true;
-        item.base64 = imgBase64Data
+        item.base64 = base64Show
       }
     });
     localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
@@ -114,7 +115,7 @@ function sign_submit() {
       if (item.riskCode == riskCode) {
         item.baseEncryp = imgBase64Data;
         item.isSign = true;
-        item.base64 = imgBase64Data
+        item.base64 = base64Show
       }
     });
     localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
