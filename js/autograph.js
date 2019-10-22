@@ -97,14 +97,14 @@ function sign_submit() {
   var originStatus = signInfo.originStatus;
   var attachmentShow = localStorage.getItem("attachmentShow");
   var signVal = localStorage.getItem("sign-val");
-  var base64Show = $('#xss_20').attr('src')
+  var base64Show = $("#xss_20").attr("src");
   if (originStatus == "1") {
     var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
     appntSignList.forEach(item => {
       if (item.documentType == "3") {
         item.baseEncryp = imgBase64Data;
         item.isSign = true;
-        item.base64 = base64Show
+        item.base64 = base64Show;
       }
     });
     localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
@@ -115,7 +115,7 @@ function sign_submit() {
       if (item.riskCode == riskCode) {
         item.baseEncryp = imgBase64Data;
         item.isSign = true;
-        item.base64 = base64Show
+        item.base64 = base64Show;
       }
     });
     localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
@@ -128,12 +128,14 @@ function sign_submit() {
           if (item.documentType == "1") {
             item.baseEncryp = imgBase64Data;
             item.isSign = true;
+            item.base64 = base64Show;
           }
         });
         localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
       } else {
         insuredSign.sign.baseEncryp = imgBase64Data;
         insuredSign.sign.isSign = true;
+        insuredSign.sign.base64 = base64Show;
         localStorage.setItem("sign-insured", JSON.stringify(insuredSign));
       }
     } else {
@@ -142,10 +144,12 @@ function sign_submit() {
       if (signVal == "0" || signVal == "2") {
         appntSign.sign.baseEncryp = imgBase64Data;
         appntSign.sign.isSign = true;
+        appntSign.sign.base64 = base64Show;
         localStorage.setItem("sign-appnt", JSON.stringify(appntSign));
       } else {
         insuredSign.sign.baseEncryp = imgBase64Data;
         insuredSign.sign.isSign = true;
+        insuredSign.sign.base64 = base64Show;
         localStorage.setItem("sign-insured", JSON.stringify(insuredSign));
       }
     }
@@ -153,9 +157,9 @@ function sign_submit() {
   } else if (originStatus == "4") {
     sessionStorage.setItem("imgBase64Data", imgBase64Data);
     sessionStorage.setItem("wxSigned", true);
+    sessionStorage.setItem("base64", base64Show);
   }
   location.href = originUrl;
-
 }
 function testGenData() {
   var res = document.getElementById("result");
