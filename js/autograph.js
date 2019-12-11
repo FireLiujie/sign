@@ -1,77 +1,77 @@
-var businessId = String(Math.random() * 10).substring(3, 8); //集成信手书业务的唯一标识
+var businessId = String(Math.random() * 10).substring(3, 8) //集成信手书业务的唯一标识
 
 $(function() {
   // 测试999999，生产40010618
-  testAnySign("40010618");
-  testSetTemplateData();
-  apiInstance.showSignatureDialog("20");
-});
+  testAnySign('40010618')
+  testSetTemplateData()
+  apiInstance.showSignatureDialog('20')
+})
 
 // 信手书API初始化
 function testAnySign(channel) {
-  var res;
+  var res
 
   //识别回调接口
   var identify_callback = function(errCode) {
     if (errCode == SUCCESS) {
-      return;
+      return
     }
     if (errCode == DATA_CANNOT_PARSED) {
-      alert("输入数据项无法解析！");
+      alert('输入数据项无法解析！')
     } else if (errCode == SERVICE_SYSTEM_EXCEPTION) {
-      alert("服务系统异常错误！");
+      alert('服务系统异常错误！')
     } else if (errCode == RECOGNITION_RESULT_EMPTY) {
-      alert("识别结果为空！");
+      alert('识别结果为空！')
     } else if (errCode == CONNECTION_SERVICE_TIMEOUT) {
-      alert("连接识别服务超时！");
+      alert('连接识别服务超时！')
     } else if (errCode == CONNECTION_RECOGNITION_EXCEPTION) {
-      alert("连接识别服务异常！");
+      alert('连接识别服务异常！')
     } else if (errCode == RECOGNITION_FALSE) {
-      alert("书写错误！");
+      alert('书写错误！')
     } else {
-      alert(errCode);
+      alert(errCode)
     }
-  };
+  }
 
   var callback = function(context_id, context_type, val) {
     if (context_type == CALLBACK_TYPE_SIGNATURE) {
       //签名回显
-      document.getElementById("xss_20").src = "data:image/png;base64," + val;
-      var aImg = document.getElementById("xss_20");
+      document.getElementById('xss_20').src = 'data:image/png;base64,' + val
+      var aImg = document.getElementById('xss_20')
       for (var i = 0; i < aImg.length; i++) {
-        aImg[i].style.height = "1500";
-        aImg[i].style.width = "1500";
+        aImg[i].style.height = '1500'
+        aImg[i].style.width = '1500'
       }
     }
 
-    testGenData();
-  }; //测试回调，将回调数据显示
+    testGenData()
+  } //测试回调，将回调数据显示
 
   //设置签名算法，默认为RSA，可以设置成SM2为生产加密方式
   // EncAlgType.EncAlg = "RSA";
-  EncAlgType.EncAlg = "SM2";
+  EncAlgType.EncAlg = 'SM2'
 
-  apiInstance = new AnySignApi();
+  apiInstance = new AnySignApi()
   //初始化签名接口
-  res = apiInstance.initAnySignApi(callback, channel);
-  setIdentifyCallBack(identify_callback);
+  res = apiInstance.initAnySignApi(callback, channel)
+  setIdentifyCallBack(identify_callback)
 
   //注册单字签字对象20
-  res = testAddSignatureObj(20);
+  res = testAddSignatureObj(20)
   if (!res) {
-    alert("testAddSignatureObj error");
+    alert('testAddSignatureObj error')
   }
 
   //将配置提交
-  res = apiInstance.commitConfig();
+  res = apiInstance.commitConfig()
 }
 
 //配置模板数据
 function testSetTemplateData() {
   //文件数据
-  var formData = "<html></html>";
-  var template_serial = "4000"; //用于生成PDF的模板ID
-  var res;
+  var formData = '<html></html>'
+  var template_serial = '4000' //用于生成PDF的模板ID
+  var res
 
   //配置JSON格式签名原文
   /**
@@ -87,96 +87,150 @@ function testSetTemplateData() {
     formData,
     businessId,
     template_serial
-  );
+  )
 }
 
 function sign_submit() {
-  var signInfo = JSON.parse(localStorage.getItem("signInfo"));
-  var originUrl = signInfo.originUrl;
-  var imgBase64Data = $("#imgBase64Data").val();
-  var originStatus = signInfo.originStatus;
-  var attachmentShow = localStorage.getItem("attachmentShow");
-  var signVal = localStorage.getItem("sign-val");
-  var base64Show = $("#xss_20").attr("src");
-  if (originStatus == "1") {
-    var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
+  var signInfo = JSON.parse(localStorage.getItem('signInfo'))
+  var originUrl = signInfo.originUrl
+  var imgBase64Data = $('#imgBase64Data').val()
+  var originStatus = signInfo.originStatus
+  var attachmentShow = localStorage.getItem('attachmentShow')
+  var signVal = localStorage.getItem('sign-val')
+  var base64Show = $('#xss_20').attr('src')
+  if (originStatus == '1') {
+    var appntSignList = JSON.parse(localStorage.getItem('sign-appnt'))
     appntSignList.forEach(item => {
-      if (item.documentType == "3") {
-        item.baseEncryp = imgBase64Data;
-        item.isSign = true;
-        item.base64 = base64Show;
+      if (item.documentType == '3') {
+        item.baseEncryp = imgBase64Data
+        item.isSign = true
+        item.base64 = base64Show
       }
-    });
-    localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
-  } else if (originStatus == "2") {
-    var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
-    var riskCode = signInfo.riskCode;
+    })
+    localStorage.setItem('sign-appnt', JSON.stringify(appntSignList))
+  } else if (originStatus == '2') {
+    var appntSignList = JSON.parse(localStorage.getItem('sign-appnt'))
+    var riskCode = signInfo.riskCode
     appntSignList.forEach(item => {
       if (item.riskCode == riskCode) {
-        item.baseEncryp = imgBase64Data;
-        item.isSign = true;
-        item.base64 = base64Show;
+        item.baseEncryp = imgBase64Data
+        item.isSign = true
+        item.base64 = base64Show
       }
-    });
-    localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
-  } else if (originStatus == "3") {
-    if (attachmentShow == "0") {
-      var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
-      var insuredSign = JSON.parse(localStorage.getItem("sign-insured"));
-      if (signVal == "0" || signVal == "2") {
+    })
+    localStorage.setItem('sign-appnt', JSON.stringify(appntSignList))
+  } else if (originStatus == '3') {
+    if (attachmentShow == '0') {
+      var appntSignList = JSON.parse(localStorage.getItem('sign-appnt'))
+      var insuredSign = JSON.parse(localStorage.getItem('sign-insured'))
+      if (signVal == '0' || signVal == '2') {
         appntSignList.forEach(item => {
-          if (item.documentType == "1") {
-            item.baseEncryp = imgBase64Data;
-            item.isSign = true;
-            item.base64 = base64Show;
+          if (item.documentType == '1') {
+            item.baseEncryp = imgBase64Data
+            item.isSign = true
+            item.base64 = base64Show
           }
-        });
-        localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
+        })
+        localStorage.setItem('sign-appnt', JSON.stringify(appntSignList))
       } else {
-        insuredSign.sign.baseEncryp = imgBase64Data;
-        insuredSign.sign.isSign = true;
-        insuredSign.sign.base64 = base64Show;
-        localStorage.setItem("sign-insured", JSON.stringify(insuredSign));
+        insuredSign.sign.baseEncryp = imgBase64Data
+        insuredSign.sign.isSign = true
+        insuredSign.sign.base64 = base64Show
+        localStorage.setItem('sign-insured', JSON.stringify(insuredSign))
       }
     } else {
-      var appntSign = JSON.parse(localStorage.getItem("sign-appnt"));
-      var insuredSign = JSON.parse(localStorage.getItem("sign-insured"));
-      if (signVal == "0" || signVal == "2") {
-        appntSign.sign.baseEncryp = imgBase64Data;
-        appntSign.sign.isSign = true;
-        appntSign.sign.base64 = base64Show;
-        localStorage.setItem("sign-appnt", JSON.stringify(appntSign));
+      var appntSign = JSON.parse(localStorage.getItem('sign-appnt'))
+      var insuredSign = JSON.parse(localStorage.getItem('sign-insured'))
+      if (signVal == '0' || signVal == '2') {
+        if (appntSign.signMore.length) {
+          let index = appntSign.signMore.length - 1
+          appntSign.signMore[index].baseEncryp = imgBase64Data
+          appntSign.signMore[index].isSign = true
+          appntSign.signMore[index].base64 = base64Show
+        } else {
+          appntSign.sign.baseEncryp = imgBase64Data
+          appntSign.sign.isSign = true
+          appntSign.sign.base64 = base64Show
+        }
+        localStorage.setItem('sign-appnt', JSON.stringify(appntSign))
       } else {
-        insuredSign.sign.baseEncryp = imgBase64Data;
-        insuredSign.sign.isSign = true;
-        insuredSign.sign.base64 = base64Show;
-        localStorage.setItem("sign-insured", JSON.stringify(insuredSign));
+        insuredSign.sign.baseEncryp = imgBase64Data
+        insuredSign.sign.isSign = true
+        insuredSign.sign.base64 = base64Show
+        localStorage.setItem('sign-insured', JSON.stringify(insuredSign))
       }
     }
-    sessionStorage.setItem("wxSigned", true);
-  } else if (originStatus == "4") {
-    sessionStorage.setItem("imgBase64Data", imgBase64Data);
-    sessionStorage.setItem("wxSigned", true);
-    sessionStorage.setItem("base64", base64Show);
+    sessionStorage.setItem('wxSigned', true)
+  } else if (originStatus == '4') {
+    sessionStorage.setItem('imgBase64Data', imgBase64Data)
+    sessionStorage.setItem('wxSigned', true)
+    sessionStorage.setItem('base64', base64Show)
+  } else if (originStatus == '5') {
+    if (attachmentShow == '0') {
+      var appntSignList = JSON.parse(localStorage.getItem('sign-appnt'))
+      var insuredSign = JSON.parse(localStorage.getItem('sign-insured'))
+      var riskCode = signInfo.riskCode
+      console.log(riskCode)
+      if (signVal == '0' || signVal == '2') {
+        appntSignList.forEach(item => {
+          if (item.riskCode == riskCode) {
+            console.log(item)
+            item.baseEncryp = imgBase64Data
+            item.isSign = true
+            item.base64 = base64Show
+          }
+        })
+        console.log(appntSignList)
+        localStorage.setItem('sign-appnt', JSON.stringify(appntSignList))
+      } else {
+        insuredSign.sign.baseEncryp = imgBase64Data
+        insuredSign.sign.isSign = true
+        insuredSign.sign.base64 = base64Show
+        localStorage.setItem('sign-insured', JSON.stringify(insuredSign))
+      }
+    } else {
+      var appntSign = JSON.parse(localStorage.getItem('sign-appnt'))
+      var insuredSign = JSON.parse(localStorage.getItem('sign-insured'))
+      var riskCode = signInfo.riskCode
+      console.log(riskCode)
+      if (signVal == '0' || signVal == '2') {
+        appntSign.signMore.forEach(item => {
+          if (item.riskCode == riskCode) {
+            item.baseEncryp = imgBase64Data
+            item.isSign = true
+            item.base64 = base64Show
+          }
+        })
+        console.log(appntSign.signMore)
+        localStorage.setItem('sign-appnt', JSON.stringify(appntSign))
+      } else {
+        insuredSign.sign.baseEncryp = imgBase64Data
+        insuredSign.sign.isSign = true
+        insuredSign.sign.base64 = base64Show
+        localStorage.setItem('sign-insured', JSON.stringify(insuredSign))
+      }
+    }
+    sessionStorage.setItem('wxSigned', true)
   }
-  location.href = originUrl;
+
+  location.href = originUrl
 }
 function testGenData() {
-  var res = document.getElementById("result");
+  var res = document.getElementById('result')
 
   try {
-    res.value = apiInstance.getUploadDataGram(); // 生成签名请求加密包
-    console.log("````````````加密包``````````");
-    console.log(res.value);
-    $("#imgBase64Data").val(res.value);
-    sign_submit();
+    res.value = apiInstance.getUploadDataGram() // 生成签名请求加密包
+    console.log('````````````加密包``````````')
+    console.log(res.value)
+    $('#imgBase64Data').val(res.value)
+    sign_submit()
   } catch (err) {
-    alert(err);
+    alert(err)
   }
 }
 
 function cancelSign() {
-  var signInfo = JSON.parse(localStorage.getItem("signInfo"));
-  var originUrl = signInfo.originUrl;
-  location.href = originUrl;
+  var signInfo = JSON.parse(localStorage.getItem('signInfo'))
+  var originUrl = signInfo.originUrl
+  location.href = originUrl
 }
