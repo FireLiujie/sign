@@ -211,6 +211,13 @@ function sign_submit() {
       }
     }
     sessionStorage.setItem('wxSigned', true)
+  } else if (originStatus == '6') {
+    //保全签名
+    var customerSign = JSON.parse(sessionStorage.customerSign)
+    customerSign.baseEncryp = imgBase64Data
+    customerSign.base64 = base64Show
+    customerSign.isSign = true
+    sessionStorage.customerSign = JSON.stringify(customerSign)
   }
 
   location.href = originUrl
