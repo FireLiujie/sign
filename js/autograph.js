@@ -1,6 +1,6 @@
 var businessId = String(Math.random() * 10).substring(3, 8) //集成信手书业务的唯一标识
 
-$(function() {
+$(function () {
   // 测试999999，生产40010618
   testAnySign('40010618')
   testSetTemplateData()
@@ -12,7 +12,7 @@ function testAnySign(channel) {
   var res
 
   //识别回调接口
-  var identify_callback = function(errCode) {
+  var identify_callback = function (errCode) {
     if (errCode == SUCCESS) {
       return
     }
@@ -33,7 +33,7 @@ function testAnySign(channel) {
     }
   }
 
-  var callback = function(context_id, context_type, val) {
+  var callback = function (context_id, context_type, val) {
     if (context_type == CALLBACK_TYPE_SIGNATURE) {
       //签名回显
       document.getElementById('xss_20').src = 'data:image/png;base64,' + val
@@ -99,8 +99,9 @@ function sign_submit() {
   var signVal = localStorage.getItem('sign-val')
   var base64Show = $('#xss_20').attr('src')
   if (originStatus == '1') {
+    // 提示书
     var appntSignList = JSON.parse(localStorage.getItem('sign-appnt'))
-    appntSignList.forEach(item => {
+    appntSignList.forEach((item) => {
       if (item.documentType == '3') {
         item.baseEncryp = imgBase64Data
         item.isSign = true
@@ -109,10 +110,11 @@ function sign_submit() {
     })
     localStorage.setItem('sign-appnt', JSON.stringify(appntSignList))
   } else if (originStatus == '2') {
+    // 免责
     var appntSignList = JSON.parse(localStorage.getItem('sign-appnt'))
     var riskCode = signInfo.riskCode
-    appntSignList.forEach(item => {
-      if (item.riskCode == riskCode) {
+    appntSignList.forEach((item) => {
+      if (item.riskCode == riskCode && item.documentType == 4) {
         item.baseEncryp = imgBase64Data
         item.isSign = true
         item.base64 = base64Show
@@ -120,11 +122,12 @@ function sign_submit() {
     })
     localStorage.setItem('sign-appnt', JSON.stringify(appntSignList))
   } else if (originStatus == '3') {
+    // 电子投保单签名
     if (attachmentShow == '0') {
       var appntSignList = JSON.parse(localStorage.getItem('sign-appnt'))
       var insuredSign = JSON.parse(localStorage.getItem('sign-insured'))
       if (signVal == '0' || signVal == '2') {
-        appntSignList.forEach(item => {
+        appntSignList.forEach((item) => {
           if (item.documentType == '1') {
             item.baseEncryp = imgBase64Data
             item.isSign = true
@@ -143,10 +146,13 @@ function sign_submit() {
       var insuredSign = JSON.parse(localStorage.getItem('sign-insured'))
       if (signVal == '0' || signVal == '2') {
         if (appntSign.signMore.length) {
-          let index = appntSign.signMore.length - 1
-          appntSign.signMore[index].baseEncryp = imgBase64Data
-          appntSign.signMore[index].isSign = true
-          appntSign.signMore[index].base64 = base64Show
+          appntSign.signMore.forEach((sign) => {
+            if (sign.documentType == '1') {
+              sign.baseEncryp = imgBase64Data
+              sign.isSign = true
+              sign.base64 = base64Show
+            }
+          })
         } else {
           appntSign.sign.baseEncryp = imgBase64Data
           appntSign.sign.isSign = true
@@ -162,18 +168,20 @@ function sign_submit() {
     }
     sessionStorage.setItem('wxSigned', true)
   } else if (originStatus == '4') {
+    // 抄录
     sessionStorage.setItem('imgBase64Data', imgBase64Data)
     sessionStorage.setItem('wxSigned', true)
     sessionStorage.setItem('base64', base64Show)
   } else if (originStatus == '5') {
+    // 产品说明书
     if (attachmentShow == '0') {
       var appntSignList = JSON.parse(localStorage.getItem('sign-appnt'))
       var insuredSign = JSON.parse(localStorage.getItem('sign-insured'))
       var riskCode = signInfo.riskCode
       console.log(riskCode)
       if (signVal == '0' || signVal == '2') {
-        appntSignList.forEach(item => {
-          if (item.riskCode == riskCode) {
+        appntSignList.forEach((item) => {
+          if (item.riskCode == riskCode && item.documentType == 10) {
             console.log(item)
             item.baseEncryp = imgBase64Data
             item.isSign = true
@@ -194,8 +202,8 @@ function sign_submit() {
       var riskCode = signInfo.riskCode
       console.log(riskCode)
       if (signVal == '0' || signVal == '2') {
-        appntSign.signMore.forEach(item => {
-          if (item.riskCode == riskCode) {
+        appntSign.signMore.forEach((item) => {
+          if (item.riskCode == riskCode && item.documentType == 10) {
             item.baseEncryp = imgBase64Data
             item.isSign = true
             item.base64 = base64Show
@@ -218,6 +226,32 @@ function sign_submit() {
     customerSign.base64 = base64Show
     customerSign.isSign = true
     sessionStorage.customerSign = JSON.stringify(customerSign)
+  } else if (originStatus == '7') {
+    // 婴幼儿问卷签名
+    if (attachmentShow == '0') {
+      var appntSignList = JSON.parse(localStorage.getItem('sign-appnt'))
+      appntSignList.forEach((item) => {
+        if (item.documentType == '20') {
+          item.baseEncryp = imgBase64Data
+          item.isSign = true
+          item.base64 = base64Show
+        }
+      })
+      localStorage.setItem('sign-appnt', JSON.stringify(appntSignList))
+    } else {
+      var appntSign = JSON.parse(localStorage.getItem('sign-appnt'))
+      if (appntSign.signMore.length) {
+        appntSign.signMore.forEach((sign) => {
+          if (sign.documentType == '20') {
+            sign.baseEncryp = imgBase64Data
+            sign.isSign = true
+            sign.base64 = base64Show
+          }
+        })
+      }
+      localStorage.setItem('sign-appnt', JSON.stringify(appntSign))
+    }
+    sessionStorage.setItem('wxSigned', true)
   }
 
   location.href = originUrl
