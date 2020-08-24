@@ -312,8 +312,8 @@ function SignatureConfig(signer, signRule) {
   this.isTSS = false;
   this.nessesary = false; //是否为必签项
   // this.antialias = true; //(只针对签名)是否开启字迹抗锯齿算法
-  this.singleWidth = 50; //(只针对签名)生成的签字最大宽度(不排除实际签名宽度小于此值)，单位像素
-  this.singleHeight = 50; //(只针对签名)生成的签字最大高度(不排除实际签名高度小于此值)，单位像素
+  this.singleWidth = 100; //(只针对签名)生成的签字最大宽度(不排除实际签名宽度小于此值)，单位像素
+  this.singleHeight = 100; //(只针对签名)生成的签字最大高度(不排除实际签名高度小于此值)，单位像素
   this.penColor = "#000000"; //RGB，默认为黑色，每通道为0~255的16进制值，如#ffffff为白色
   this.signatureImgRatio = 5.0; //保存到加密包中的图片 相对于设置大小的倍数 如设置为100*160，该值为2.0时，则保存图片为100*2.0 *160*2.0，该值越大，则生成PDF中的签名越清晰，并且所占空间越大
   this.timeTag = null; //签名人信息，为必填项, 1:时间在上、2：时间在下、3：时间在右
