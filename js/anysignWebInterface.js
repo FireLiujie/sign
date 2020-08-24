@@ -75,7 +75,7 @@ function AnySignApi() {
    * @param channel Function with 3 params(int context_id, int callback_type, String data)
    * @returns {boolean} 是否初始化成功以及是否回调函数参数满足要求
    */
-  this.initAnySignApi = function(callback, channel) {
+  this.initAnySignApi = function (callback, channel) {
     if (callback && callback instanceof Function && callback.length >= 3) {
       core = new anysignWebImpl();
       core._initAnySignApi(callback, channel);
@@ -85,7 +85,7 @@ function AnySignApi() {
     }
   };
 
-  this.addDataObj = function(context_id, dataConfig) {
+  this.addDataObj = function (context_id, dataConfig) {
     if (!dataConfig instanceof DataConfig) {
       return false;
     }
@@ -101,7 +101,7 @@ function AnySignApi() {
    * @param signatureConfig 签字配置信息
    * @returns {boolean}
    */
-  this.addSignatureObj = function(context_id, signatureConfig) {
+  this.addSignatureObj = function (context_id, signatureConfig) {
     if (!signatureConfig instanceof SignatureConfig) return false;
 
     return core._addSignatureObj(context_id, signatureConfig);
@@ -114,14 +114,14 @@ function AnySignApi() {
    * @param signatureConfig 签字配置信息
    * @returns {boolean}
    */
-  this.addCommentObj = function(context_id, signatureConfig) {
+  this.addCommentObj = function (context_id, signatureConfig) {
     if (!signatureConfig instanceof SignatureConfig) return false;
 
     return core._addCommentObj(context_id, signatureConfig);
   };
 
 
-  this.addEvidence = function(context_id, content, format, bioType, index) {
+  this.addEvidence = function (context_id, content, format, bioType, index) {
     return core._addEvidence(context_id, content, format, bioType, index);
   };
 
@@ -129,7 +129,7 @@ function AnySignApi() {
    * 添加证据hash值
    * content：为Hash计算之后的值
    */
-  this.addEvidenceHash = function(context_id, content, format, bioType, index) {
+  this.addEvidenceHash = function (context_id, content, format, bioType, index) {
     return core._addEvidenceHash(context_id, content, format, bioType, index);
   };
 
@@ -138,7 +138,7 @@ function AnySignApi() {
    * @param signatureConfig 公司签章对象
    * @returns {boolean}
    */
-  this.addCachetObj = function(cachetConfig) {
+  this.addCachetObj = function (cachetConfig) {
     if (!(cachetConfig instanceof CachetConfig)) {
       return false;
     }
@@ -154,7 +154,7 @@ function AnySignApi() {
    * @param businessId 业务工单号
    * @returns {*} 是否设置成功
    */
-  this.setTemplate = function(
+  this.setTemplate = function (
     template_type,
     contentUtf8Str,
     businessId,
@@ -170,7 +170,7 @@ function AnySignApi() {
     else return false;
   };
 
-  this.setTID = function(tid) {
+  this.setTID = function (tid) {
     return core._setTID(tid);
   };
 
@@ -180,7 +180,7 @@ function AnySignApi() {
    * @param data utf8字符串或者uint8Array数组
    * @returns {*} 是否设置成功
    */
-  this.setData = function(context_id, data) {
+  this.setData = function (context_id, data) {
     return core._setData(context_id, data);
   };
 
@@ -189,7 +189,7 @@ function AnySignApi() {
    * @param context_id
    * @return 是否成功弹出：成功：0 错误：相应EC错误码定义
    */
-  this.showSignatureDialog = function(context_id) {
+  this.showSignatureDialog = function (context_id) {
     return core._showSignatureDialog(context_id);
   };
 
@@ -198,18 +198,18 @@ function AnySignApi() {
    * @param context_id
    * @return 是否成功弹出：成功：0 错误：相应EC错误码定义
    */
-  this.showCommentDialog = function(context_id) {
+  this.showCommentDialog = function (context_id) {
     return core._showCommentDialog(context_id);
   };
 
-  this.setIdentifyCallBack = function(callBack) {
+  this.setIdentifyCallBack = function (callBack) {
     return core._setIdentifyCallBack(callBack);
   };
 
   /**
    * 提交更改，一旦调用，在本次签名流程中不允许再设置表单数据(setTableData)和签名、拍照配置等信息
    */
-  this.commitConfig = function() {
+  this.commitConfig = function () {
     return core._commitConfig();
   };
 
@@ -217,7 +217,7 @@ function AnySignApi() {
    * 重新配置Api，调用之后可以设置表单数据(setTableData)和签名、拍照配置等信息
    * 注：前一次业务的签名、拍照等数据会被清空
    */
-  this.resetConfig = function() {
+  this.resetConfig = function () {
     return core._resetConfig();
   };
 
@@ -225,7 +225,7 @@ function AnySignApi() {
    * 一次业务完成(签名、拍照均做完)后，调用此接口判断上传诗句是否准备就绪
    * @return ture false
    */
-  this.isReadyToUpload = function() {
+  this.isReadyToUpload = function () {
     return core._isReadyToUpload();
   };
 
@@ -233,7 +233,7 @@ function AnySignApi() {
    * 一次业务完成(签名、拍照均做完)后，调用此接口获取须上传至信手书服务器的业务加密数据
    * @return 加密的业务数据。如果
    */
-  this.getUploadDataGram = function() {
+  this.getUploadDataGram = function () {
     return core._getUploadDataGram();
   };
 
@@ -242,14 +242,14 @@ function AnySignApi() {
    * 保存当前的数据
    * @return 加密的业务数据。
    */
-  this.saveBusiness = function(encKey) {
+  this.saveBusiness = function (encKey) {
     return core._saveBusinessSession(encKey);
   };
   /**
    * add by han 20151217
    * 恢复之前保存的加密业务数据
    */
-  this.restoreBusiness = function(encData, desKey) {
+  this.restoreBusiness = function (encData, desKey) {
     return core._restoreBusinessSession(encData, desKey);
   };
 
@@ -258,7 +258,7 @@ function AnySignApi() {
    * @param null
    * @returns null
    */
-  this.getVersion = function() {
+  this.getVersion = function () {
     return "AnySign_V1.3.3_Web_2.3.3";
   };
 
@@ -266,7 +266,7 @@ function AnySignApi() {
    * 获取操作系统信息，格式为"操作系统名##版本号"，如"android##4.1.2"、"ios##7.1.2"
    * @returns {*}
    */
-  this.getOSInfo = function() {
+  this.getOSInfo = function () {
     return core._getOSInfo();
   };
 }
@@ -413,7 +413,7 @@ function CachetConfig(signer, signRule, isTss) {
  * @param KWIndex KWIndex 第几个关键字
  * @constructor
  */
-var SignRule_KeyWord = function(
+var SignRule_KeyWord = function (
   keyword,
   keyWordAlignMethod,
   keyWordOffset,
@@ -457,7 +457,7 @@ var SignRule_KeyWord = function(
  * @param KWIndex KWIndex 第几个关键字
  * @constructor  批注暂不支持
  */
-var SignRule_KeyWordV2 = function(keyword, xOffset, yOffset, pageNo, KWIndex) {
+var SignRule_KeyWordV2 = function (keyword, xOffset, yOffset, pageNo, KWIndex) {
   if (!keyword || keyword.length === 0) {
     throw "SignRule_KeyWordV2 constructor parameter keyword could not be null or empty";
   }
@@ -481,7 +481,7 @@ var SignRule_KeyWordV2 = function(keyword, xOffset, yOffset, pageNo, KWIndex) {
  * @param tid 服务器端生成的配置规则
  * @constructor
  */
-var SignRule_Tid = function(tid) {
+var SignRule_Tid = function (tid) {
   if (!tid || tid.length === 0) {
     throw "SignRule_Tid constructor parameter tid could not be null or empty";
   }
@@ -501,7 +501,7 @@ var SignRule_Tid = function(tid) {
  * @param unit 坐标系单位，目前支持"dp"和"pt"
  * @constructor
  */
-var SignRule_XYZ = function(left, top, right, bottom, pageNo, unit) {
+var SignRule_XYZ = function (left, top, right, bottom, pageNo, unit) {
   if (
     isNaN(left) ||
     isNaN(top) ||
@@ -536,7 +536,7 @@ var SignRule_XYZ = function(left, top, right, bottom, pageNo, unit) {
   };
 };
 
-var Signer = function(name, id_num) {
+var Signer = function (name, id_num) {
   if (!name || !id_num || name.length === 0 || id_num.length === 0) {
     throw "Signer constructor parameter name and id could not be null or empty";
   }
@@ -548,7 +548,7 @@ var Signer = function(name, id_num) {
   this.IDType = "1";
 };
 
-var TimeTag = function(position, format) {
+var TimeTag = function (position, format) {
   if (!position || !format || position.length === 0 || format.length === 0) {
     throw "TimeTag constructor parameter { and position could not be null or empty";
   }
