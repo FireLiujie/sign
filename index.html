@@ -45,64 +45,75 @@
 
       //添加单签签名框
       function testAddSignatureObj(objId) {
-        var urlParams = decodeURI(window.location.search.substring(1));
-        var paramsArr = urlParams.split("&");
-        var urlSignIfo={};
+        var urlParams = decodeURI(window.location.search.substring(1))
+        var paramsArr = urlParams.split('&')
+        var paramsObj = {}
         for (var i = 0; i < paramsArr.length; i++) {
-          var pair = paramsArr[i].split("=");
-          urlSignIfo[pair[0]]=pair[1]?pair[1]:''
+          var pair = paramsArr[i].split('=')
+          paramsObj[pair[0]] = pair[1] ? pair[1] : ''
         }
-        var signInfo =localStorage.getItem("signInfo")
-        // JSON.parse(localStorage.getItem("signInfo"));
-        if(!signInfo){
-          localStorage.setItem('signInfo',JSON.stringify(urlSignIfo))
-          signInfo = JSON.parse(localStorage.getItem("signInfo"));
-        }
-        return setTimeout(()=>{
-          var signOffset = signInfo.offset;
-          var signName = signInfo.name;
-          var idNo = signInfo.idNo;
-          var keyword = signInfo.keyword;
-          // var signOffset = '50'
-          // var signName = '刘杰';
-          // var idNo = '429001199008170412';
-          // var keyword = '法定监护人';
-          var context_id = objId;
-          console.log("````````````````````````");
-          console.log("测试是否进来");
-          console.log("·····························");
-          console.log("signName:" + signName);
-          console.log("idNo:" + idNo);
-          console.log("keyword:" + keyword);
-          console.log("signOffset:" + signOffset);
-          // var signer = new Signer("刘杰", "429001199008170412");
-          var signer = new Signer(signName, idNo);
-
-          /**
-           * 关键字定位方式，寻找PDF中的关键字，根据关键字位置放置签名图片
-           * @param keyword 关键字
-           * @param keyWordAlignMethod 签字图片和关键字位置关系：等于1时，签字图片和关键字矩形重心重合
-           *                            等于2时，签字图片位于关键字正下方，中心线对齐；等于3时，签字图片位于关键字正右方，中心线对齐；
-           *                            等于4时，签字图片左上角和关键字右下角重合，可能额外附加偏移量，详见构造函数的offset参数
-           * @param keyWordOffset 当keyWordAlignMethod非零时，额外附加的偏移量，单位pt
-           * @param pageNo 寻找关键字的PDF起始页码
-           * @param KWIndex KWIndex 第几个关键字
-           * @constructor
-           */
-          var signerRule = new SignRule_KeyWord(
-                  keyword,
-                  3,
-                  Number(signOffset),
-                  1,
-                  1
-          );
-          var signatureConfig = new SignatureConfig(signer, signerRule);
-          console.log(signatureConfig);
-          var res = apiInstance.addSignatureObj(context_id, signatureConfig);
-          return res;
-        },300)
+        console.log(paramsObj)
+        var reg = ''
+        $.ajax({
+          url: paramsObj.ip + '/sale/v2/wechatTemp/weChatDetail',
+          data: JSON.stringify({ id: paramsObj.uuid }),
+          type: 'POST',
+          async: false,
+          contentType: 'application/json',
+          dataType: 'json',
+          // headers:{
+          //   token:'cf67410a148149b397e232dd1ca7b390'
+          // },
+          success: function (resp) {
+            console.log(resp)
+            var data = JSON.parse(resp.content.content[0].value)
+            Object.keys(data).forEach(function (key) {
+              sessionStorage.setItem(key, JSON.stringify(data[key]))
+            })
+            var signInfo = data.signInfo
+            var signOffset = signInfo.offset
+            var signName = signInfo.name
+            var idNo = signInfo.idNo
+            var keyword = signInfo.keyword
+            // var signOffset = '50'
+            // var signName = '刘杰';
+            // var idNo = '429001199008170412';
+            // var keyword = '法定监护人';
+            var context_id = objId
+            console.log('````````````````````````')
+            console.log('测试是否进来')
+            console.log('·····························')
+            console.log('signName:' + signName)
+            console.log('idNo:' + idNo)
+            console.log('keyword:' + keyword)
+            console.log('signOffset:' + signOffset)
+            var signer = new Signer(signName, idNo)
+            /**
+             * 关键字定位方式，寻找PDF中的关键字，根据关键字位置放置签名图片
+             * @param keyword 关键字
+             * @param keyWordAlignMethod 签字图片和关键字位置关系：等于1时，签字图片和关键字矩形重心重合
+             *                            等于2时，签字图片位于关键字正下方，中心线对齐；等于3时，签字图片位于关键字正右方，中心线对齐；
+             *                            等于4时，签字图片左上角和关键字右下角重合，可能额外附加偏移量，详见构造函数的offset参数
+             * @param keyWordOffset 当keyWordAlignMethod非零时，额外附加的偏移量，单位pt
+             * @param pageNo 寻找关键字的PDF起始页码
+             * @param KWIndex KWIndex 第几个关键字
+             * @constructor
+             */
+            var signerRule = new SignRule_KeyWord(
+              keyword,
+              3,
+              Number(signOffset),
+              1,
+              1
+            )
+            var signatureConfig = new SignatureConfig(signer, signerRule)
+            console.log(signatureConfig)
+            var res = apiInstance.addSignatureObj(context_id, signatureConfig)
+            reg = res
+          },
+        })
+        return reg
       }
-
       function setIdentifyCallBack(callback) {
         if (!apiInstance) {
           alert('信手书接口没有初始化')
@@ -119,9 +130,7 @@
         <center>
           <div id="dialog">
             <!-- 显示签名区域-->
-            <div id="anysign_title" style="display: none;">
-              请申请人测试签字
-            </div>
+            <div id="anysign_title" style="display: none">请申请人测试签字</div>
             <div id="container" onclick="return false;" class="hs">
               <!-- <canvas id="anysignCanvas" height="240" width="600"></canvas> -->
               <canvas id="anysignCanvas" height="1" width="1"></canvas>
@@ -140,10 +149,10 @@
                 value="右移"
               />
             </div>
-            <div id="btnContainerOuter" style="width: 100%;">
+            <div id="btnContainerOuter" style="width: 100%">
               <div
                 id="btnContainerInner"
-                style="text-align: center; font-size: 5pt;"
+                style="text-align: center; font-size: 5pt"
                 width="100%"
               >
                 <div class="img-wrap">
@@ -187,12 +196,12 @@
           >
             <img id="xss_20" class="xss_20" />
           </div>
-          <textarea id="result" rows="10" style="display: none;"></textarea>
+          <textarea id="result" rows="10" style="display: none"></textarea>
           <textarea
             id="imgBase64Data"
             rows="10"
             name="imgBase64Data"
-            style="display: none;"
+            style="display: none"
           ></textarea>
         </center>
         <div id="msk"></div>

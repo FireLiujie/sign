@@ -58,8 +58,9 @@ function testAnySign(channel) {
 
   //注册单字签字对象20
   res = testAddSignatureObj(20)
+  console.log(res, '2');
   if (!res) {
-    alert('testAddSignatureObj error')
+    alert('testAddSignatureObj error!!!')
   }
 
   //将配置提交
