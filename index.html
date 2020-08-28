@@ -52,9 +52,9 @@
           var pair = paramsArr[i].split('=')
           paramsObj[pair[0]] = pair[1] ? pair[1] : ''
         }
-        console.log(paramsObj)
         var reg = ''
         $.ajax({
+          // url: paramsObj.ip+'/sale/v2/wechatTemp/weChatDetail',
           url: paramsObj.ip + '/sale/v2/wechatTemp/weChatDetail',
           data: JSON.stringify({ id: paramsObj.uuid }),
           type: 'POST',
@@ -65,11 +65,11 @@
           //   token:'cf67410a148149b397e232dd1ca7b390'
           // },
           success: function (resp) {
-            console.log(resp)
             var data = JSON.parse(resp.content.content[0].value)
             Object.keys(data).forEach(function (key) {
-              sessionStorage.setItem(key, JSON.stringify(data[key]))
+              localStorage.setItem(key, JSON.stringify(data[key]))
             })
+
             var signInfo = data.signInfo
             var signOffset = signInfo.offset
             var signName = signInfo.name
