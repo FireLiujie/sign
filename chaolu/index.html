@@ -156,20 +156,7 @@
 
                     	  //添加单签签名框
               function testAddSignatureObj(objId) {
-                var urlParams = decodeURI(window.location.search.substring(1));
-                var paramsArr = urlParams.split("&");
-                var urlSignIfo={};
-                for (var i = 0; i < paramsArr.length; i++) {
-                  var pair = paramsArr[i].split("=");
-                  urlSignIfo[pair[0]]=pair[1]?pair[1]:''
-                }
-                var signInfo =localStorage.getItem("signInfo")
-                // JSON.parse(localStorage.getItem("signInfo"));
-                if(!signInfo){
-                  localStorage.setItem('signInfo',JSON.stringify(urlSignIfo))
-                  signInfo = JSON.parse(localStorage.getItem("signInfo"));
-                }
-                return setTimeout(()=>{
+                var signInfo = JSON.parse(localStorage.getItem("signInfo"));
                 var signOffset = signInfo.offset;
                 var signName = signInfo.name;
                 var idNo = signInfo.idNo;
@@ -205,7 +192,6 @@
                 console.log(signatureConfig);
                 var res = apiInstance.addSignatureObj(context_id, signatureConfig);
                 return res;
-                },300)
               }
 
 
