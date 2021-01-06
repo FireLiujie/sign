@@ -1,10 +1,9 @@
 /**
- * Created by fengbo on 14-7-4.
+ * fixed by liujie 2021.01.06
  */
 
 document.write('<link href="css/canvas_css.css" rel="stylesheet">');
 document.write('<link href="css/sp.css" rel="stylesheet">');
-
 document.write(
   '<link media="screen and (max-width: 480px)" href="css/mw480Portrait.css" rel="stylesheet">'
 );
@@ -14,11 +13,9 @@ document.write(
 document.write(
   '<link media="screen and (min-width: 1024px)" href="css/sw1024.css" rel="stylesheet">'
 );
-
 document.write(
   '<script language=javascript src="libs/zlib/deflate.min.js" charset="utf-8"></script>'
 );
-
 document.write(
   '<script language=javascript src="libs/CryptoJS v3.1.2/components/core-min.js" charset="utf-8"></script>'
 );
@@ -31,7 +28,6 @@ document.write(
 document.write(
   '<script language=javascript src="libs/CryptoJS v3.1.2/components/mode-ecb.js" charset="utf-8"></script>'
 );
-
 document.write(
   '<script language=javascript src="libs/anysignCommentUI.js" charset="utf-8"></script>'
 );
@@ -41,9 +37,7 @@ document.write(
 document.write(
   '<script language=javascript src="libs/jquery-1.4.2.min.js" charset="utf-8"></script>'
 );
-
 var core;
-
 function AnySignApi() {
   //constants
   this.CALLBACK_TYPE_SIGNATURE = 1; //签名框点击确认之后的回调，回调中包含签名快照
@@ -99,16 +93,9 @@ function AnySignApi() {
     return core._addDataObj(context_id, dataConfig);
   };
 
-  //  /**
-  //   * 添加识别参数
-  //   */
-  //  this.startOCR = function(ocrCapture)
-  //  {
-  //  	return core._startOCR(ocrCapture);
-  //  }
 
   /**
-   * 配置一个签名，context_id区间为[20,30)，20~29为普通签名，30~39为多字批示。
+   * 配置一个签名，context_id区间为[20,30)&[200,300)，20~29为普通签名，30~39为多字批示。
    * 根据signatureConfig配置签字相应属性。
    * @param context_id 签字对象唯一标识
    * @param signatureConfig 签字配置信息
@@ -133,11 +120,6 @@ function AnySignApi() {
     return core._addCommentObj(context_id, signatureConfig);
   };
 
-  /**
-         
-	*jane
-        
-	*/
 
   this.addEvidence = function (context_id, content, format, bioType, index) {
     return core._addEvidence(context_id, content, format, bioType, index);
@@ -250,36 +232,6 @@ function AnySignApi() {
     return core._setIdentifyCallBack(callBack);
   };
 
-  //	/**
-  //	 * 根据context_id，对指定对象做拍照请求
-  //	 * @param context_id
-  //	 * return int
-  //	 */
-  //	this.takePicture = function(context_id)
-  //	{
-  //		return false;
-  //	}
-  //
-  //	/**
-  //	 * 根据context_id，对指定对象开始做视频、音频录制等
-  //	 * @param context_id
-  //	 * return int
-  //	 */
-  //	this.startMediaRecording = function(context_id)
-  //	{
-  //		return false;
-  //	}
-  //
-  //	/**
-  //	 * 结束指定多媒体录制，结果将通过回调返回
-  //	 * @param context_id
-  //	 * return int
-  //	 */
-  //	this.finishMediaRecording = function(context_id)
-  //	{
-  //		return false;
-  //	}
-
   /**
    * 提交更改，一旦调用，在本次签名流程中不允许再设置表单数据(setTableData)和签名、拍照配置等信息
    */
@@ -365,33 +317,6 @@ function DataConfig() {
 }
 
 /**
- * 拍照配置对象，用于为此次签名事务添加一个拍照
- * @constructor
- */
-//function PhotoConfig()
-//{
-//    this.cid = 0;
-//    this.width = 640;//int px
-//    this.height = 480;//int px
-//    this.median = false;//bool 二值化过滤是否开启，启用二值化，图片尺寸会显著降低，但在某些光照不充足条件下中值取值会不准确
-//    this.mono = true;//bool 黑白过滤是否开启，当median为true时，此选项无效
-//    this.quality = 85//int 0~100 推荐85
-//    this.openFromGallery = false;//是否从相册选择照片
-//    this.applyConfigOnGalleryPic = true;//当openFromGallery为true时有效。表示是否将width等配置信息应用于画廊图片。如为false，则使用画廊原始图片
-//    this.encodeToDataGram = true;//是否将数据添加到加密数据包中
-//}
-
-/*function MediaConfig()
- {
- this.cid = 0;
- this.mediaType = "audio";//支持类型：audio、video
- this.mediaFormat = "wav";//支持类型：mpeg4、3gp、wav
- this.duration = 10;//时长，单位：秒
- this.useBuiltInUI = true;
- this.encodeToDataGram = true;//是否将数据添加到加密数据包中
- }*/
-
-/**
  * 签名配置，配合AnySignApi实例的addSignatureObj函数为此次签名事务添加一个签名
  * @param signer 签名人，参考Signer定义
  * @param signRule 签名规则，参考SignRule_Tid等SignRule定义
@@ -413,7 +338,6 @@ function SignatureConfig(signer, signRule) {
   }
 
   this.signer = signer; //签名人信息，为必填项
-
   this.signRule = signRule; //签名放置到文档中的规则，如位置，大小等，为必填项
 
   var signInfo = JSON.parse(localStorage.getItem("signInfo"));
@@ -423,18 +347,13 @@ function SignatureConfig(signer, signRule) {
   this.title = ""; //签字输入有效，签字框标题
   this.titleSpanFromOffset = 4; //当为普通签名时有效，表示title中需要放大显示字体的数组起始index
   this.titleSpanToOffset = 5; //当为普通签名时有效，表示title中需要放大显示字体的数组结束index
-
   this.isTSS = false;
   this.nessesary = false; //是否为必签项
-  //    this.dlgXoffset = 0;//(只针对签名)弹出框相对于屏幕正中位置x偏移量，默认为0
-  //    this.dlgYoffset = 0;//(只针对签名)弹出框相对于屏幕正中位置y偏移量，默认为0
-  //    this.antialias = true;//(只针对签名)是否开启字迹抗锯齿算法
-  this.singleWidth = 30; //(只针对签名)生成的签字最大宽度(不排除实际签名宽度小于此值)，单位像素
-  this.singleHeight = 30; //(只针对签名)生成的签字最大高度(不排除实际签名高度小于此值)，单位像素
+  // this.antialias = true; //(只针对签名)是否开启字迹抗锯齿算法
+  this.singleWidth = 50; //(只针对签名)生成的签字最大宽度(不排除实际签名宽度小于此值)，单位像素
+  this.singleHeight = 50; //(只针对签名)生成的签字最大高度(不排除实际签名高度小于此值)，单位像素
   this.penColor = "#000000"; //RGB，默认为黑色，每通道为0~255的16进制值，如#ffffff为白色
-  this.signatureImgRatio = 1.0; //保存到加密包中的图片 相对于设置大小的倍数 如设置为100*160，该值为2.0时，则保存图片为100*2.0 *160*2.0，该值越大，则生成PDF中的签名越清晰，并且所占空间越大
-  /////////////////////////deprecated
-
+  this.signatureImgRatio = 5.0; //保存到加密包中的图片 相对于设置大小的倍数 如设置为100*160，该值为2.0时，则保存图片为100*2.0 *160*2.0，该值越大，则生成PDF中的签名越清晰，并且所占空间越大
   this.timeTag = null; //签名人信息，为必填项, 1:时间在上、2：时间在下、3：时间在右
   this.isdistinguish = false; //是否开启识别
   this.ocrCapture = null; //识别参数
