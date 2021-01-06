@@ -339,19 +339,15 @@ function SignatureConfig(signer, signRule) {
 
   this.signer = signer; //签名人信息，为必填项
   this.signRule = signRule; //签名放置到文档中的规则，如位置，大小等，为必填项
-
-  var signInfo = JSON.parse(localStorage.getItem("signInfo"));
-
-  // this.title = "本人已阅读保险条款、产品说明书和投保提示书，了解本产品的特点和保单利益的不确定性。";//批示输入有效，批示内容
   this.cid = 0;
-  this.title = ""; //签字输入有效，签字框标题
-  this.titleSpanFromOffset = 4; //当为普通签名时有效，表示title中需要放大显示字体的数组起始index
+  this.title = "请申请人手写签名"; //签字输入有效，签字框标题
+  this.titleSpanFromOffset = 5; //当为普通签名时有效，表示title中需要放大显示字体的数组起始index
   this.titleSpanToOffset = 5; //当为普通签名时有效，表示title中需要放大显示字体的数组结束index
   this.isTSS = false;
   this.nessesary = false; //是否为必签项
   // this.antialias = true; //(只针对签名)是否开启字迹抗锯齿算法
-  this.singleWidth = 50; //(只针对签名)生成的签字最大宽度(不排除实际签名宽度小于此值)，单位像素
-  this.singleHeight = 50; //(只针对签名)生成的签字最大高度(不排除实际签名高度小于此值)，单位像素
+  this.singleWidth = 150; //(只针对签名)生成的签字最大宽度(不排除实际签名宽度小于此值)，单位像素
+  this.singleHeight = 150; //(只针对签名)生成的签字最大高度(不排除实际签名高度小于此值)，单位像素
   this.penColor = "#000000"; //RGB，默认为黑色，每通道为0~255的16进制值，如#ffffff为白色
   this.signatureImgRatio = 5.0; //保存到加密包中的图片 相对于设置大小的倍数 如设置为100*160，该值为2.0时，则保存图片为100*2.0 *160*2.0，该值越大，则生成PDF中的签名越清晰，并且所占空间越大
   this.timeTag = null; //签名人信息，为必填项, 1:时间在上、2：时间在下、3：时间在右
@@ -385,8 +381,8 @@ function CommentConfig(signer, signRule) {
   this.cid = 0;
   this.commitment = signInfo.commentText;
   this.mass_words_in_single_line = 20;
-  this.mass_word_height = 25;
-  this.mass_word_width = 25;
+  this.mass_word_height = 58;
+  this.mass_word_width = 72;
   this.isTSS = false;
   this.penColor = "#000000"; //RGB，默认为黑色，每通道为0~255的16进制值，如#ffffff为白色
   this.nessesary = false; //是否为必签项
