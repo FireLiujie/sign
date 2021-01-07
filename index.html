@@ -50,10 +50,6 @@
         var signName = signInfo.name
         var idNo = signInfo.idNo
         var keyword = signInfo.keyword
-        // var signOffset = '50'
-        // var signName = '刘杰';
-        // var idNo = '429001199008170412';
-        // var keyword = '法定监护人';
         var context_id = objId
         console.log('````````````````````````')
         console.log('测试是否进来')
@@ -62,7 +58,6 @@
         console.log('idNo:' + idNo)
         console.log('keyword:' + keyword)
         console.log('signOffset:' + signOffset)
-        // var signer = new Signer("刘杰", "429001199008170412");
         var signer = new Signer(signName, idNo)
         /**
          * 关键字定位方式，寻找PDF中的关键字，根据关键字位置放置签名图片
@@ -108,7 +103,6 @@
               请申请人测试签字
             </div>
             <div id="container" onclick="return false;" class="hs">
-              <!-- <canvas id="anysignCanvas" height="240" width="600"></canvas> -->
               <canvas id="anysignCanvas" height="1" width="1"></canvas>
             </div>
             <div id="single_scrollbar">

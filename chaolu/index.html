@@ -27,13 +27,9 @@
       }
 
       .comment_btncontainer {
-        /*text-align: center;
-          font-size: 30pt;
-          width: 100%;
-          clear: both;*/
-
         text-align: center;
-        margin: 0 auto font-size: 40pt;
+        margin: 0 auto;
+        font-size: 40pt;
         width: 100%;
         clear: both;
         position: absolute;
@@ -61,702 +57,551 @@
         background: -webkit-gradient(linear, left top, left bottom, from(#faa51a), to(#f47a20));
       }
     </style>
-    <script src="https://cdn.bootcss.com/eruda/1.5.8/eruda.min.js"></script>
-    <script>
-      eruda.init()
-    </script>
 
     <script language="JavaScript" type="text/JavaScript" charset="utf-8">
       $(function () {
+        // 测试999999，生产40010618
+        testAnySign("40010618");
+        console.log(111)
 
-                      // 测试999999，生产40010618
-                      testAnySign("40010618");
-                      console.log(111)
+        testSetTemplateData();
+        apiInstance.showSignatureDialog('20')
+      });
 
-                      testSetTemplateData();
-                      apiInstance.showSignatureDialog('20')
-                      // apiInstance.showCommentDialog("30");
+      document.onreadystatechange = setAlertTitle;
 
-                      });
+      var apiInstance;
+      var fileData;
+      var ocrCapture;
 
-                      document.onreadystatechange = setAlertTitle;
+      var DATA_CANNOT_PARSED = "10003"; //输入数据项无法解析
+      var SERVICE_SYSTEM_EXCEPTION = "10011"; //服务系统异常错误
+      var RECOGNITION_RESULT_EMPTY = "10100"; //识别结果为空
+      var CONNECTION_SERVICE_TIMEOUT = "10101"; //连接识别服务超时
+      var CONNECTION_RECOGNITION_EXCEPTION = "10102"; //连接识别服务异常
+      var SUCCESS = "0"; //识别成功
+      var RECOGNITION_FALSE = "-1";//识别错误
 
-                      var apiInstance;
-                      var fileData;
-                      var ocrCapture;
-
-          			var DATA_CANNOT_PARSED = "10003"; //输入数据项无法解析
-          			var SERVICE_SYSTEM_EXCEPTION = "10011"; //服务系统异常错误
-          			var RECOGNITION_RESULT_EMPTY = "10100"; //识别结果为空
-          			var CONNECTION_SERVICE_TIMEOUT = "10101"; //连接识别服务超时
-          			var CONNECTION_RECOGNITION_EXCEPTION = "10102"; //连接识别服务异常
-          			var SUCCESS = "0"; //识别成功
-          			var RECOGNITION_FALSE = "-1";//识别错误
-
-                      function setAlertTitle()
-                      {
-                          document.title = "返回结果";
-                      }
+      function setAlertTitle()
+      {
+          document.title = "返回结果";
+      }
 
 
-          			//配置模板数据
-                      function testSetTemplateData()
-                      {
-
-                         // var formData = "{\"bjcaxssrequest\":{\"submitinfo\":[{\"username\":\"测星雨\",\"identitycardnbr\":\"320902198901191012\"},{\"username\":\"测星雨123\",\"identitycardnbr\": \"320902198901191012\"}]}}";
-
-                          var formData = "<html><head><title></title><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><div><div><label>keyword:</label></div><div><label>列名2：</label></div><div><label>列名3：</label></div></div></body></html>";
-                         //文件数据
-          //  		    var formData = fileData;
-                          var businessId = "123123";//集成信手书业务的唯一标识
-
-                          var template_serial = "4000";//用于生成PDF的模板ID
+      //配置模板数据
+      function testSetTemplateData()
+      {
+          var formData = "<html><head><title></title><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><div><div><label>keyword:</label></div><div><label>列名2：</label></div><div><label>列名3：</label></div></div></body></html>";
+          //文件数据
+          var businessId = "123123";//集成信手书业务的唯一标识
+          
+          var template_serial = "4000";//用于生成PDF的模板ID
 
 
-                          var res;
+          var res;
 
-                          //配置JSON格式签名原文
-                          /**
-                           * 设置表单数据，每次业务都需要set一次
-                           * @param template_type 签名所用的模板类型
-                           * @param contentUtf8Str 表单数据，类型为Utf8字符串
-                           * @param businessId 业务工单号
-                           * @param template_serial 模板序列号
-                           * @returns {*} 是否设置成功
-                           */
-                          res = apiInstance.setTemplate(TemplateType.HTML,formData,businessId,template_serial);
+          //配置JSON格式签名原文
+          /**
+            * 设置表单数据，每次业务都需要set一次
+            * @param template_type 签名所用的模板类型
+            * @param contentUtf8Str 表单数据，类型为Utf8字符串
+            * @param businessId 业务工单号
+            * @param template_serial 模板序列号
+            * @returns {*} 是否设置成功
+            */
+          res = apiInstance.setTemplate(TemplateType.HTML,formData,businessId,template_serial);
 
-                          if(res)
-                          {
-                          //  alert("setTemplateData success");
-                              return res;
-                          }
-                          else
-                          {
-                              alert("setTemplateData error");
-                              return res;
-                          }
-                      }
+          if(res)
+          {
+              return res;
+          }
+          else
+          {
+              alert("setTemplateData error");
+              return res;
+          }
+      }
 
                       //选择文件
-          			function  handleFiles(files)
-          			{
-              			if(files.length)
-              			{
-                  			var file = files[0];
-                  			var reader = new FileReader();
+      function  handleFiles(files)
+      {
+          if(files.length)
+          {
+              var file = files[0];
+              var reader = new FileReader();
 
-                  			reader.onload = function FileReaderOnload() {
-                      		var buffer = reader.result;
-                      		var uint8Array = new Uint8Array(reader.result);
-                      		var bufStr = "";
-                      		var bufarray = Base64.encodeUint8Array(uint8Array);
-                      		bufStr = bufarray;
-                      		fileData = bufStr;
-                  			};
-                  			reader.readAsArrayBuffer(file);
-              			}
-          			}
+              reader.onload = function FileReaderOnload() {
+                var buffer = reader.result;
+                var uint8Array = new Uint8Array(reader.result);
+                var bufStr = "";
+                var bufarray = Base64.encodeUint8Array(uint8Array);
+                bufStr = bufarray;
+                fileData = bufStr;
+              };
+              reader.readAsArrayBuffer(file);
+          }
+      }
 
                     	  //添加单签签名框
-              function testAddSignatureObj(objId) {
-                var signInfo = JSON.parse(localStorage.getItem("signInfo"));
-                var signOffset = signInfo.offset;
-                var signName = signInfo.name;
-                var idNo = signInfo.idNo;
-                var keyword = signInfo.keyword;
-                var context_id = objId;
-                console.log("````````````````````````");
-                console.log("测试是否进来");
-                console.log("·····························");
-                console.log("signName:" + signName);
-                console.log("idNo:" + idNo);
-                console.log("keyword:" + keyword);
-                console.log("signOffset:" + signOffset);
-                var signer = new Signer(signName, idNo);
-                /**
-                 * 关键字定位方式，寻找PDF中的关键字，根据关键字位置放置签名图片
-                 * @param keyword 关键字
-                 * @param keyWordAlignMethod 签字图片和关键字位置关系：等于1时，签字图片和关键字矩形重心重合
-                 *                            等于2时，签字图片位于关键字正下方，中心线对齐；等于3时，签字图片位于关键字正右方，中心线对齐；
-                 *                            等于4时，签字图片左上角和关键字右下角重合，可能额外附加偏移量，详见构造函数的offset参数
-                 * @param keyWordOffset 当keyWordAlignMethod非零时，额外附加的偏移量，单位pt
-                 * @param pageNo 寻找关键字的PDF起始页码
-                 * @param KWIndex KWIndex 第几个关键字
-                 * @constructor
-                 */
-                var signerRule = new SignRule_KeyWord(
-                  keyword,
-                  3,
-                  Number(signOffset),
-                  1,
-                  1
-                );
-                var signatureConfig = new SignatureConfig(signer, signerRule);
-                console.log(signatureConfig);
-                var res = apiInstance.addSignatureObj(context_id, signatureConfig);
+      function testAddSignatureObj(objId) {
+        var signInfo = JSON.parse(localStorage.getItem("signInfo"));
+        var signOffset = signInfo.offset;
+        var signName = signInfo.name;
+        var idNo = signInfo.idNo;
+        var keyword = signInfo.keyword;
+        var context_id = objId;
+        console.log("````````````````````````");
+        console.log("测试是否进来");
+        console.log("·····························");
+        console.log("signName:" + signName);
+        console.log("idNo:" + idNo);
+        console.log("keyword:" + keyword);
+        console.log("signOffset:" + signOffset);
+        var signer = new Signer(signName, idNo);
+        /**
+          * 关键字定位方式，寻找PDF中的关键字，根据关键字位置放置签名图片
+          * @param keyword 关键字
+          * @param keyWordAlignMethod 签字图片和关键字位置关系：等于1时，签字图片和关键字矩形重心重合
+          *                            等于2时，签字图片位于关键字正下方，中心线对齐；等于3时，签字图片位于关键字正右方，中心线对齐；
+          *                            等于4时，签字图片左上角和关键字右下角重合，可能额外附加偏移量，详见构造函数的offset参数
+          * @param keyWordOffset 当keyWordAlignMethod非零时，额外附加的偏移量，单位pt
+          * @param pageNo 寻找关键字的PDF起始页码
+          * @param KWIndex KWIndex 第几个关键字
+          * @constructor
+          */
+        var signerRule = new SignRule_KeyWord(
+          keyword,
+          3,
+          Number(signOffset),
+          1,
+          1
+        );
+        var signatureConfig = new SignatureConfig(signer, signerRule);
+        console.log(signatureConfig);
+        var res = apiInstance.addSignatureObj(context_id, signatureConfig);
+        return res;
+      }
+
+
+      //添加批签签名框
+      function testAddCommentObj(objId)
+      {
+        var signInfo = JSON.parse(localStorage.getItem("signInfo"));
+        var signName = signInfo.name;
+        var idNo =  signInfo.idNo
+        var context_id = objId;
+        var signer = new Signer(signName, idNo);
+
+        /**
+          * 根据坐标定位签名方式
+          * @param left 签名图片最左边坐标值，相对于PDF当页最左下角(0,0)点，向上和向右分别为X轴、Y轴正方向
+          * @param top 签名图片顶边坐标值，相对于PDF当页最左下角(0,0)点，向上和向右分别为X轴、Y轴正方向
+          * @param right 签名图片最右边坐标值，相对于PDF当页最左下角(0,0)点，向上和向右分别为X轴、Y轴正方向
+          * @param bottom 签名图片底边坐标值，相对于PDF当页最左下角(0,0)点，向上和向右分别为X轴、Y轴正方向
+          * @param pageNo 签名在PDF中的页码，从1开始
+          * @param unit 坐标系单位，目前支持"dp"和"pt"
+          * @constructor
+          */
+
+          document.getElementById("other").style.display = "none";
+                  /**
+          * 关键字定位方式，寻找PDF中的关键字，根据关键字位置放置签名图片
+          * @param keyword 关键字
+          * @param keyWordAlignMethod 签字图片和关键字位置关系：等于1时，签字图片和关键字矩形重心重合
+          *                           等于2时，签字图片位于关键字正下方，中心线对齐；等于3时，签字图片位于关键字正右方，中心线对齐；
+          *                            等于4时，签字图片左上角和关键字右下角重合，可能额外附加偏移量，详见构造函数的offset参数
+          * @param keyWordOffset 当keyWordAlignMethod非零时，额外附加的偏移量，单位pt
+          * @param pageNo 寻找关键字的PDF起始页码
+          * @param KWIndex KWIndex 第几个关键字
+          * @constructor
+          */
+          var signerRule = new SignRule_KeyWord(signInfo.commentKeyword,Number(signInfo.commentPos),signInfo.commentOffset,signInfo.pageNo,signInfo.KWIndex);
+
+            var commentConfig = new CommentConfig(signer,signerRule);
+            console.log(commentConfig);
+            var res = apiInstance.addCommentObj(context_id,commentConfig);
+            if(res)
+            {
                 return res;
+            }
+            else
+            {
+                alert("addCommentObj "+context_id+" error");
+                return res;
+            }
+        }
+
+
+        //demo总入口
+        function testAnySign(channel)
+        {
+          var res;
+          //识别回调接口
+          var identify_callback = function(errCode){
+            if(errCode == SUCCESS){
+              return;
+            }
+              if(errCode == DATA_CANNOT_PARSED) {
+              alert("输入数据项无法解析！");
+            } else if(errCode == SERVICE_SYSTEM_EXCEPTION) {
+                      alert("服务系统异常错误！");
+            } else if(errCode == RECOGNITION_RESULT_EMPTY) {
+                      alert("识别结果为空！");
+            } else if(errCode == CONNECTION_SERVICE_TIMEOUT) {
+                      alert("连接识别服务超时！");
+            } else if(errCode == CONNECTION_RECOGNITION_EXCEPTION) {
+                      alert("连接识别服务异常！");
+            } else if(errCode == RECOGNITION_FALSE) {
+                      alert("书写错误！");
+            }else{
+                      alert(errCode);
+            }
+          }
+
+          var callback = function(context_id,context_type,val)
+          {
+
+            if(context_type == CALLBACK_TYPE_START_RECORDING || context_type == CALLBACK_TYPE_STOP_RECORDING)
+            {
+              return;
+            }
+
+              if(context_type == CALLBACK_TYPE_SIGNATURE)
+              {
+                  //签名回显
+                  document.getElementById("xss_20").src = "data:image/png;base64," + val;
+                  var aImg=document.getElementById("xss_20");
+                  for(var i=0;i<aImg.length;i++){
+                      aImg[i].style.height="1500";
+                      aImg[i].style.width="1500";
+                  }
+              }
+              else if(context_type == CALLBACK_TYPE_COMMENTSIGN)
+              {
+                //签名回显
+                  document.getElementById("xss_21").src = "data:image/png;base64," + val;
+                  var aImg=document.getElementById("xss_21");
+                  for(var i=0;i<aImg.length;i++){
+                      aImg[i].style.height="250";
+                      aImg[i].style.width="250";
+                  }
+
+              }
+              else if(context_type == CALLBACK_TYPE_ON_PICTURE_TAKEN)
+              {
+                  document.getElementById("preview").src = "data:image/png;base64," + val;
+              }else if(context_type == CALLBACK_TYPE_ON_MEDIA_DATA)
+              {
+                var audio = document.createElement("audio");
+                  if (audio != null && audio.canPlayType && audio.canPlayType("audio/mpeg"))
+                  {
+                      audio.src = "data:image/gif;base64," + val;
+                      audio.play();
+                  }
+              }
+
+              setAlertTitle();
+            };//测试回调，将回调数据显示
+
+
+            //设置签名算法，默认为RSA，可以设置成SM2
+      EncAlgType.EncAlg = "RSA";
+
+            apiInstance = new AnySignApi();
+            //初始化签名接口
+            res = apiInstance.initAnySignApi(callback,channel);
+
+            if(!res){
+              alert("init error");
+            }else{
+
+            }
+
+            //开启识别
+            ocrCapture = new OCRCapture();
+            ocrCapture.text = "a";
+            ocrCapture.IPAdress = "http://192.168.126.32:11203/HWR/RecvServlet";
+            ocrCapture.appID = "123";
+            ocrCapture.count = 5;
+            ocrCapture.language = Language.CHS;
+            ocrCapture.resolution = 80;
+            ocrCapture.serviceID = "999999";
+
+            setIdentifyCallBack(identify_callback);
+
+
+            //注册单字签字对象20
+            res = testAddSignatureObj(20);
+            if(!res){
+                alert("testAddSignatureObj error");
+                return;
+            }else{
+
+            }
+
+            res = testAddCommentObj('30');
+            if(!res){
+                alert("testAddCommentObj error");
+                return;
+            }else{
+
+            }
+
+
+
+
+              //注册一个单位签章
+
+              var signer = new Signer("小明","110xxxxxx");
+              /**
+                * 使用服务器规则配置签名
+                * @param tid 服务器端生成的配置规则
+                * @constructor
+                */
+              var signerRule = new SignRule_Tid("888888");
+              var cachet_config = new CachetConfig(signer, signerRule, false);
+
+
+              //将配置提交
+              res = apiInstance.commitConfig();
+
+              if(res){
+                // alert("Init ALL 提交配置成功");
+              }else{
+                alert("Init ALL 提交配置失败");
               }
 
 
-                      //添加批签签名框
-                      function testAddCommentObj(objId)
+          }
+
+          function testIsReadyToUpload()
+          {
+              alert("testIsReadyToUpload :" + apiInstance.isReadyToUpload());
+          }
+          function sign_submit() {
+            var signInfo = JSON.parse(localStorage.getItem("signInfo"));
+            var originUrl = signInfo.originUrl;
+            var imgBase64Data = $("#imgBase64Data").val();
+            var originStatus = signInfo.originStatus;
+            var attachmentShow = localStorage.getItem("attachmentShow");
+            var signVal = localStorage.getItem("sign-val");
+            var base64Show = $("#xss_20").attr("src");
+            var base64show21 = $("#xss_21").attr("src");
+            if (originStatus == "1") {
+              // var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
+              sessionStorage.setItem("oneimgBase64Data", imgBase64Data);
+              sessionStorage.setItem("onewxSigned", true);
+
+            } else if (originStatus == "2") {
+              sessionStorage.setItem("twoimgBase64Data", imgBase64Data);
+              sessionStorage.setItem("twowxSigned", true);
+
+            } else if (originStatus == "3") {
+              sessionStorage.setItem("threeimgBase64Data", imgBase64Data);
+              sessionStorage.setItem("threewxSigned", true);
+              // sessionStorage.setItem("threewxSigned", true);
+            } else if (originStatus == "4") {
+              if (attachmentShow == '0') {
+                var appntSignList = JSON.parse(localStorage.getItem('sign-appnt'))
+                  var insuredSign = JSON.parse(localStorage.getItem('sign-insured'))
+                  if (signVal == '0' || signVal == '2') {
+                    appntSignList.forEach(item => {
+                      if (item.policyUrl == localStorage['insurance-policyUrl']) {
+                        item.baseEncryp = imgBase64Data
+                        item.isSign = true
+                        item.base64 = base64Show
+                      }
+                    })
+                    console.log(appntSignList)
+                    localStorage.setItem('sign-appnt', JSON.stringify(appntSignList))
+                  } else {
+                    insuredSign.sign.baseEncryp = imgBase64Data
+                    insuredSign.sign.isSign = true
+                    insuredSign.sign.base64 = base64Show
+                    localStorage.setItem('sign-insured', JSON.stringify(insuredSign))
+                  }
+                } else {
+                  var appntSign = JSON.parse(localStorage.getItem('sign-appnt'))
+                  var insuredSign = JSON.parse(localStorage.getItem('sign-insured'))
+                  if (signVal == '0' || signVal == '2') {
+                    appntSign.signMore.forEach(item => {
+                      if (item.policyUrl == localStorage['insurance-policyUrl']) {
+                        item.baseEncryp = imgBase64Data
+                        item.isSign = true
+                        item.base64 = base64Show
+                      }
+                    })
+                    localStorage.setItem('sign-appnt', JSON.stringify(appntSign))
+                  } else {
+                    insuredSign.sign.baseEncryp = imgBase64Data
+                    insuredSign.sign.isSign = true
+                    insuredSign.sign.base64 = base64Show
+                    localStorage.setItem('sign-insured', JSON.stringify(insuredSign))
+                  }
+                }
+                sessionStorage.setItem('wxSigned', true)
+              }
+              // console.log(base64show21)
+              console.log(imgBase64Data)
+              document.getElementById("other").style.display = "none";
+              location.href = originUrl;
+            }
+          //生成签名加密数据
+          function testGenData()
+          {
+              var res = document.getElementById('result');
+
+              try
+              {
+                  res.value = apiInstance.getUploadDataGram();
+                  localStorage.setItem('val',res.value)
+                  $("#imgBase64Data").val(res.value);
+                  sign_submit();
+              }
+              catch(err)
+              {
+                  alert(err);
+              }
+          }
+
+          //弹出签名框签名
+          function testPopupDialog(context_id)
+          {
+            if(!apiInstance){
+                  alert("信手书接口没有初始化");
+                  return;
+            }
+              switch (apiInstance.showSignatureDialog(context_id))
+              {
+                  case RESULT_OK:
+              document.getElementById("other").style.display = "none";
+                      break;
+                  case EC_API_NOT_INITED:
+                      alert("信手书接口没有初始化");
+                      break;
+                  case EC_WRONG_CONTEXT_ID:
+                      alert("没有配置相应context_id的签字对象");
+                      break;
+              }
+          }
+
+          function setIdentifyCallBack(callback){
+            if(!apiInstance){
+                  alert("信手书接口没有初始化");
+                  return;
+            }
+            apiInstance.setIdentifyCallBack(callback);
+          }
+
+          //弹出批注签名框
+          function testCommentDialog(context_id)
+          {
+            if(!apiInstance){
+                  alert("信手书接口没有初始化");
+                  return;
+            }
+              switch (apiInstance.showCommentDialog(context_id))
+              {
+                  case RESULT_OK:
+              document.getElementById("other").style.display = "none";
+                      break;
+                  case EC_API_NOT_INITED:
+                      alert("信手书接口没有初始化");
+                      break;
+                  case EC_WRONG_CONTEXT_ID:
+                      alert("没有配置相应context_id的签字对象");
+                      break;
+                  case EC_COMMENT_ALREADY_SHOW:
+                      alert("批注签名框已弹出，请勿重复操作！");
+              }
+
+          }
+
+          //获取签名api版本信息
+          function testGetVersion()
+          {
+              alert(apiInstance.getVersion());
+          }
+
+          //获取设备操作系统信息
+          function testGetOsInfo()
+          {
+              alert(apiInstance.getOSInfo());
+              alert(navigator.userAgent);
+              alert(window.__wxjs_is_wkwebview);
+          }
+
+          //jane
+          function testAddEvidence(result)
+          {
+              alert(apiInstance.addEvidence(20,result,DataFormat.IMAGE_JPEG,BioType.PHOTO_SIGNER_IDENTITY_CARD_BACK,0));
+          }
+
+      function testSaveBusiness(){
+
+          var encKey = "334324afa";
+          var encData = apiInstance.saveBusiness(encKey);
+
+          var res = document.getElementById('result');
+          res.value = encData;
+
+      }
+
+      function testRestoreBusiness(){
+
+          var callback = function(context_id,context_type,val)
+          {
+              if(context_type == CALLBACK_TYPE_START_RECORDING || context_type == CALLBACK_TYPE_STOP_RECORDING)
+              {
+                  return;
+              }
+
+              if(context_type == CALLBACK_TYPE_SIGNATURE)
+                  {
+                      //签名回显
+                      document.getElementById("xss_20").src = "data:image/png;base64," + val;
+                  }
+                  else if(context_type == CALLBACK_TYPE_ON_PICTURE_TAKEN)
+                  {
+                      document.getElementById("preview").src = "data:image/png;base64," + val;
+                  }else if(context_type == CALLBACK_TYPE_ON_MEDIA_DATA)
+                  {
+                      var audio = document.createElement("audio");
+                      if (audio != null && audio.canPlayType && audio.canPlayType("audio/mpeg"))
                       {
-                        var signInfo = JSON.parse(localStorage.getItem("signInfo"));
-                // var signOffset = signInfo.offset;
-                var signName = signInfo.name;
-                // var signName = signInfo.name;
-                // var idNo = signInfo.idNo;
-                var idNo =  signInfo.idNo
-                // var keyword = signInfo.keyword;
-                // var keyword = signInfo.keyword;
-                // var signOffset = '50'
-                // var signName = '刘杰';
-                // var idNo = '429001199008170412';
-                // var keyword = '认真';
-                var context_id = objId;
-                          // var context_id = objId;
-                          var signer = new Signer(signName, idNo);
-
-                          /**
-                           * 根据坐标定位签名方式
-                           * @param left 签名图片最左边坐标值，相对于PDF当页最左下角(0,0)点，向上和向右分别为X轴、Y轴正方向
-                           * @param top 签名图片顶边坐标值，相对于PDF当页最左下角(0,0)点，向上和向右分别为X轴、Y轴正方向
-                           * @param right 签名图片最右边坐标值，相对于PDF当页最左下角(0,0)点，向上和向右分别为X轴、Y轴正方向
-                           * @param bottom 签名图片底边坐标值，相对于PDF当页最左下角(0,0)点，向上和向右分别为X轴、Y轴正方向
-                           * @param pageNo 签名在PDF中的页码，从1开始
-                           * @param unit 坐标系单位，目前支持"dp"和"pt"
-                           * @constructor
-                           */
-                          // var signerRule = new SignRule_XYZ(84.0, 523.0, 400.0, 477.0, 1, "dp");
-
-
-                        console.log('批注进来')
-                        document.getElementById("other").style.display = "none";
-                         /**
-           				* 关键字定位方式，寻找PDF中的关键字，根据关键字位置放置签名图片
-           				* @param keyword 关键字
-           				* @param keyWordAlignMethod 签字图片和关键字位置关系：等于1时，签字图片和关键字矩形重心重合
-           				*                           等于2时，签字图片位于关键字正下方，中心线对齐；等于3时，签字图片位于关键字正右方，中心线对齐；
-           				*                            等于4时，签字图片左上角和关键字右下角重合，可能额外附加偏移量，详见构造函数的offset参数
-           				* @param keyWordOffset 当keyWordAlignMethod非零时，额外附加的偏移量，单位pt
-           				* @param pageNo 寻找关键字的PDF起始页码
-           				* @param KWIndex KWIndex 第几个关键字
-           				* @constructor
-           				*/
-                       var signerRule = new SignRule_KeyWord(signInfo.commentKeyword,Number(signInfo.commentPos),signInfo.commentOffset,signInfo.pageNo,signInfo.KWIndex);
-                      //  var signerRule = new SignRule_KeyWord('认真',2,'30','1','1');
-
-                          var commentConfig = new CommentConfig(signer,signerRule);
-                          console.log(commentConfig);
-          //                   1:时间在上、2：时间在下、3：时间在右
-          //                 var timeTag = new TimeTag(1,"yyMMdd hh:mm;ss");
-          // //                signatureConfig.timeTag = timeTag;
-          //                 commentConfig.isTSS = false;//是否开始时间戳服务
-          // //              commentConfig.commitment = "本人已阅读保险条款、产品说明书和投保提示书，了解本产品的特点和保单利益的不确定性。";
-          // 				commentConfig.commitment = "本人已阅读";
-          // //              commentConfig.commitmentTextSize = 20+"px";
-          //                 commentConfig.mass_word_height = 50;
-          //                 commentConfig.mass_word_width = 50;
-          //                 commentConfig.mass_words_in_single_line = 4;
-          // 				commentConfig.penColor = "#FF0000";
-          //                 commentConfig.nessesary = false;
-          //                 commentConfig.isdistinguish = false;
-          //                 commentConfig.ocrCapture = ocrCapture;
-                          var res = apiInstance.addCommentObj(context_id,commentConfig);
-                          if(res)
-                          {
-                              // alert("addCommentObj "+context_id+" success");
-                              return res;
-                          }
-                          else
-                          {
-                              alert("addCommentObj "+context_id+" error");
-                              return res;
-                          }
+                          audio.src = "data:image/gif;base64," + val;
+                          audio.play();
                       }
-
-
-                      //demo总入口
-                      function testAnySign(channel)
-                      {
-                          var res;
-
-                          //识别回调接口
-                          var identify_callback = function(errCode){
-                          	if(errCode == SUCCESS){
-                          		return;
-                          	}
-                            	if(errCode == DATA_CANNOT_PARSED) {
-                          		alert("输入数据项无法解析！");
-          					} else if(errCode == SERVICE_SYSTEM_EXCEPTION) {
-                          		alert("服务系统异常错误！");
-          					} else if(errCode == RECOGNITION_RESULT_EMPTY) {
-                          		alert("识别结果为空！");
-          					} else if(errCode == CONNECTION_SERVICE_TIMEOUT) {
-                          		alert("连接识别服务超时！");
-          					} else if(errCode == CONNECTION_RECOGNITION_EXCEPTION) {
-                          		alert("连接识别服务异常！");
-          					} else if(errCode == RECOGNITION_FALSE) {
-                          		alert("书写错误！");
-          					}else{
-                          		alert(errCode);
-          					}
-                          }
-
-                          var callback = function(context_id,context_type,val)
-                          {
-
-                  			// document.getElementById("other").style.display = "block";
-                          	if(context_type == CALLBACK_TYPE_START_RECORDING || context_type == CALLBACK_TYPE_STOP_RECORDING)
-                          	{
-                          		return;
-                          	}
-
-                              if(context_type == CALLBACK_TYPE_SIGNATURE)
-                              {
-                                  //签名回显
-                                  document.getElementById("xss_20").src = "data:image/png;base64," + val;
-                                  var aImg=document.getElementById("xss_20");
-                                  for(var i=0;i<aImg.length;i++){
-                                      aImg[i].style.height="1500";
-                                      aImg[i].style.width="1500";
-                                  }
-                              }
-                              else if(context_type == CALLBACK_TYPE_COMMENTSIGN)
-                              {
-                              	//签名回显
-                                  document.getElementById("xss_21").src = "data:image/png;base64," + val;
-                                  var aImg=document.getElementById("xss_21");
-                                  for(var i=0;i<aImg.length;i++){
-                                      aImg[i].style.height="250";
-                                      aImg[i].style.width="250";
-                                  }
-
-                              }
-                              else if(context_type == CALLBACK_TYPE_ON_PICTURE_TAKEN)
-                              {
-                                  document.getElementById("preview").src = "data:image/png;base64," + val;
-                              }else if(context_type == CALLBACK_TYPE_ON_MEDIA_DATA)
-                              {
-                              	var audio = document.createElement("audio");
-                                  if (audio != null && audio.canPlayType && audio.canPlayType("audio/mpeg"))
-                                  {
-                                      audio.src = "data:image/gif;base64," + val;
-                                      audio.play();
-                                  }
-                              }
-
-                              setAlertTitle();
-                              // alert("收到浏览器回调：" + "context_id：" + context_id + " context_type：" + context_type + " value：" + val);
-                          };//测试回调，将回调数据显示
-
-                          ////////////////////////////////////////////////
-
-                          //设置签名算法，默认为RSA，可以设置成SM2
-              			EncAlgType.EncAlg = "RSA";
-
-                          apiInstance = new AnySignApi();
-          //                var channel = "10010";//渠道号，由信手书提供，请咨询项目经理
-                          //初始化签名接口
-                          res = apiInstance.initAnySignApi(callback,channel);
-
-                          if(!res){
-                          	alert("init error");
-                          }else{
-
-                          }
-                          ////////////////////////////////////////////////
-
-                          //开启识别
-                          ocrCapture = new OCRCapture();
-                          ocrCapture.text = "a";
-          				ocrCapture.IPAdress = "http://192.168.126.32:11203/HWR/RecvServlet";
-          				ocrCapture.appID = "123";
-          				ocrCapture.count = 5;
-          				ocrCapture.language = Language.CHS;
-          				ocrCapture.resolution = 80;
-          				ocrCapture.serviceID = "999999";
-          //				apiInstance.startOCR(ocrCapture);
-
-          				setIdentifyCallBack(identify_callback);
-
-                          ///////////////////////////////////////////////
-
-                          //注册单字签字对象20
-                          res = testAddSignatureObj(20);
-                          if(!res){
-                              alert("testAddSignatureObj error");
-          					return;
-                          }else{
-
-                          }
-
-                          res = testAddCommentObj('30');
-                          if(!res){
-                              alert("testAddCommentObj error");
-          					return;
-                          }else{
-
-                          }
-
-
-
-                          ////////////////////////////////////////////////
-
-                          //注册一个单位签章
-
-                          var signer = new Signer("小明","110xxxxxx");
-                          /**
-                           * 使用服务器规则配置签名
-                           * @param tid 服务器端生成的配置规则
-                           * @constructor
-                           */
-                          var signerRule = new SignRule_Tid("888888");
-                          var cachet_config = new CachetConfig(signer, signerRule, false);
-
-          //              res = apiInstance.addCachetObj(cachet_config);
-          //              ////////////////////////////////////////////////
-          //
-          //              if(!res){
-          //                  alert("addCachetObj error");
-          //              }else{
-          //
-          //              }
-                          ////////////////////////////////////////////////
-
-                          //将配置提交
-                          res = apiInstance.commitConfig();
-
-                          if(res){
-                          	// alert("Init ALL 提交配置成功");
-                          }else{
-                          	alert("Init ALL 提交配置失败");
-                          }
-
-                          ////////////////////////////////////////////////
-
-                      }
-
-                      function testIsReadyToUpload()
-                      {
-                          alert("testIsReadyToUpload :" + apiInstance.isReadyToUpload());
-                      }
-                      function sign_submit() {
-                        // var signInfo = JSON.parse(localStorage.getItem("signInfo"));
-                        // var originUrl = signInfo.originUrl;
-                        // var imgBase64Data = $("#imgBase64Data").val();
-                        // var base64Show = $("#xss_20").attr("src");
-                        // sessionStorage.setItem("imgBase64Data", imgBase64Data);
-                        // sessionStorage.setItem("wxSigned", true);
-                        // sessionStorage.setItem("base64", base64Show);
-                        // var originStatus = signInfo.originStatus;
-                        // var attachmentShow = localStorage.getItem("attachmentShow");
-                        // var signVal = localStorage.getItem("sign-val");
-
-                        // location.href = originUrl;
-                        // if (originStatus == "1") {
-                        //   var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
-                        //   appntSignList.forEach(item => {
-                        //     if (item.documentType == "3") {
-                        //       item.baseEncryp = imgBase64Data;
-                        //       item.isSign = true;
-                        //       item.base64 = base64Show;
-                        //     }
-                        //   });
-                        //   localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
-                        // } else if (originStatus == "2") {
-                        //   var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
-                        //   var riskCode = signInfo.riskCode;
-                        //   appntSignList.forEach(item => {
-                        //     if (item.riskCode == riskCode) {
-                        //       item.baseEncryp = imgBase64Data;
-                        //       item.isSign = true;
-                        //       item.base64 = base64Show;
-                        //     }
-                        //   });
-                        //   localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
-                        // } else if (originStatus == "3") {
-                        //   if (attachmentShow == "0") {
-                        //     var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
-                        //     var insuredSign = JSON.parse(localStorage.getItem("sign-insured"));
-                        //     if (signVal == "0" || signVal == "2") {
-                        //       appntSignList.forEach(item => {
-                        //         if (item.documentType == "1") {
-                        //           item.baseEncryp = imgBase64Data;
-                        //           item.isSign = true;
-                        //           item.base64 = base64Show;
-                        //         }
-                        //       });
-                        //       localStorage.setItem("sign-appnt", JSON.stringify(appntSignList));
-                        //     } else {
-                        //       insuredSign.sign.baseEncryp = imgBase64Data;
-                        //       insuredSign.sign.isSign = true;
-                        //       insuredSign.sign.base64 = base64Show;
-                        //       localStorage.setItem("sign-insured", JSON.stringify(insuredSign));
-                        //     }
-                        //   } else {
-                        //     var appntSign = JSON.parse(localStorage.getItem("sign-appnt"));
-                        //     var insuredSign = JSON.parse(localStorage.getItem("sign-insured"));
-                        //     if (signVal == "0" || signVal == "2") {
-                        //       appntSign.sign.baseEncryp = imgBase64Data;
-                        //       appntSign.sign.isSign = true;
-                        //       appntSign.sign.base64 = base64Show;
-                        //       localStorage.setItem("sign-appnt", JSON.stringify(appntSign));
-                        //     } else {
-                        //       insuredSign.sign.baseEncryp = imgBase64Data;
-                        //       insuredSign.sign.isSign = true;
-                        //       insuredSign.sign.base64 = base64Show;
-                        //       localStorage.setItem("sign-insured", JSON.stringify(insuredSign));
-                        //     }
-                        //   }
-                        //   sessionStorage.setItem("wxSigned", true);
-                        // } else if (originStatus == "4") {
-                        //   sessionStorage.setItem("imgBase64Data", imgBase64Data);
-                        //   sessionStorage.setItem("wxSigned", true);
-                        //   sessionStorage.setItem("base64", base64Show);
-                        // }
-                        var signInfo = JSON.parse(localStorage.getItem("signInfo"));
-                        var originUrl = signInfo.originUrl;
-                        var imgBase64Data = $("#imgBase64Data").val();
-                        var originStatus = signInfo.originStatus;
-                        var attachmentShow = localStorage.getItem("attachmentShow");
-                        var signVal = localStorage.getItem("sign-val");
-                        var base64Show = $("#xss_20").attr("src");
-                        var base64show21 = $("#xss_21").attr("src");
-                        if (originStatus == "1") {
-                          // var appntSignList = JSON.parse(localStorage.getItem("sign-appnt"));
-                          sessionStorage.setItem("oneimgBase64Data", imgBase64Data);
-                          sessionStorage.setItem("onewxSigned", true);
-
-                        } else if (originStatus == "2") {
-                          sessionStorage.setItem("twoimgBase64Data", imgBase64Data);
-                          sessionStorage.setItem("twowxSigned", true);
-
-                        } else if (originStatus == "3") {
-                          sessionStorage.setItem("threeimgBase64Data", imgBase64Data);
-                          sessionStorage.setItem("threewxSigned", true);
-                          // sessionStorage.setItem("threewxSigned", true);
-                        } else if (originStatus == "4") {
-                          // sessionStorage.setItem("imgBase64Data", imgBase64Data);
-                          // sessionStorage.setItem("wxSigned", true);
-                          // sessionStorage.setItem("base64", base64Show);
-
-                          if (attachmentShow == '0') {
-                            var appntSignList = JSON.parse(localStorage.getItem('sign-appnt'))
-                            var insuredSign = JSON.parse(localStorage.getItem('sign-insured'))
-                            if (signVal == '0' || signVal == '2') {
-                              appntSignList.forEach(item => {
-                                if (item.policyUrl == localStorage['insurance-policyUrl']) {
-                                  item.baseEncryp = imgBase64Data
-                                  item.isSign = true
-                                  item.base64 = base64Show
-                                }
-                              })
-                              console.log(appntSignList)
-                              localStorage.setItem('sign-appnt', JSON.stringify(appntSignList))
-                            } else {
-                              insuredSign.sign.baseEncryp = imgBase64Data
-                              insuredSign.sign.isSign = true
-                              insuredSign.sign.base64 = base64Show
-                              localStorage.setItem('sign-insured', JSON.stringify(insuredSign))
-                            }
-                          } else {
-                            var appntSign = JSON.parse(localStorage.getItem('sign-appnt'))
-                            var insuredSign = JSON.parse(localStorage.getItem('sign-insured'))
-                            if (signVal == '0' || signVal == '2') {
-                              appntSign.signMore.forEach(item => {
-                                if (item.policyUrl == localStorage['insurance-policyUrl']) {
-                                  item.baseEncryp = imgBase64Data
-                                  item.isSign = true
-                                  item.base64 = base64Show
-                                }
-                              })
-                              localStorage.setItem('sign-appnt', JSON.stringify(appntSign))
-                            } else {
-                              insuredSign.sign.baseEncryp = imgBase64Data
-                              insuredSign.sign.isSign = true
-                              insuredSign.sign.base64 = base64Show
-                              localStorage.setItem('sign-insured', JSON.stringify(insuredSign))
-                            }
-                          }
-                          sessionStorage.setItem('wxSigned', true)
-                        }
-                        // console.log(base64show21)
-                        console.log(imgBase64Data)
-                        document.getElementById("other").style.display = "none";
-                        location.href = originUrl;
-                      }
-                      //生成签名加密数据
-                      function testGenData()
-                      {
-                          var res = document.getElementById('result');
-
-                          try
-                          {
-                              res.value = apiInstance.getUploadDataGram();
-                              // alert("value"+res.value);
-                              localStorage.setItem('val',res.value)
-                              $("#imgBase64Data").val(res.value);
-
-
-                              sign_submit();
-                              // var signInfo = JSON.parse(localStorage.getItem("signInfo"));
-                              // var originUrl = signInfo.originUrl;
-                              // location.href = originUrl;
-                          }
-                          catch(err)
-                          {
-                              alert(err);
-                          }
-                      }
-
-                      //弹出签名框签名
-                      function testPopupDialog(context_id)
-                      {
-                      	if(!apiInstance){
-                              alert("信手书接口没有初始化");
-                              return;
-                      	}
-                          switch (apiInstance.showSignatureDialog(context_id))
-                          {
-                              case RESULT_OK:
-                  				document.getElementById("other").style.display = "none";
-                                  break;
-                              case EC_API_NOT_INITED:
-                                  alert("信手书接口没有初始化");
-                                  break;
-                              case EC_WRONG_CONTEXT_ID:
-                                  alert("没有配置相应context_id的签字对象");
-                                  break;
-                          }
-                      }
-
-                      function setIdentifyCallBack(callback){
-                      	if(!apiInstance){
-                              alert("信手书接口没有初始化");
-                              return;
-                      	}
-                      	apiInstance.setIdentifyCallBack(callback);
-                      }
-
-                      //弹出批注签名框
-                      function testCommentDialog(context_id)
-                      {
-                      	if(!apiInstance){
-                              alert("信手书接口没有初始化");
-                              return;
-                      	}
-                          switch (apiInstance.showCommentDialog(context_id))
-                          {
-                              case RESULT_OK:
-                  				document.getElementById("other").style.display = "none";
-                                  break;
-                              case EC_API_NOT_INITED:
-                                  alert("信手书接口没有初始化");
-                                  break;
-                              case EC_WRONG_CONTEXT_ID:
-                                  alert("没有配置相应context_id的签字对象");
-                                  break;
-                              case EC_COMMENT_ALREADY_SHOW:
-                                  alert("批注签名框已弹出，请勿重复操作！");
-                          }
-
-                      }
-
-                      //获取签名api版本信息
-                      function testGetVersion()
-                      {
-                          alert(apiInstance.getVersion());
-                      }
-
-                      //获取设备操作系统信息
-                      function testGetOsInfo()
-                      {
-                          alert(apiInstance.getOSInfo());
-                          alert(navigator.userAgent);
-                          alert(window.__wxjs_is_wkwebview);
-                      }
-
-                      //jane
-                      function testAddEvidence(result)
-                      {
-          //                MTExMTEx 为原文"111111" base64编码后数据
-          //                alert(apiInstance.addEvidence("20","MTExMTEx","AMR","2","0"));
-
-          //                字符串为图片base64编码之后的数据
-          //              var result = "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bz18e+72h1txo/lqcPrbn1p6by538dKnvvXCwPd9tXbsE9lPfO1bd3/8g9nce6/81Ld/8va7lS/cE6iMfh34xFdgypCUGFnULcTijUcf+4pSX3nM+8Ll2vdf+/5nrn38qqPPeN5LD17/wic/c/9rvj71rUPHrvruS57nPXmn/uLdy61QL1+/9dSxP3j/9Velff+S6+8s/sGxv35r45bs/b9+6PXrf/CK99LRG/oPs7kAAAnWSURBVN9+6lGllPb9177/xVs2Gt96+jGlN64pf/vD+Vwul8+/u/36c77W+pL9txb/6KnnfF9r3X9u+eitd3y46muttNJKx4125v5PX/P4Vd99xvNe+sH1z9/+6e+f0b6vlXrsqbduvPdvPe+xz7/9xc9/5ydSed3T71Ze+9Ttv/WX6zGvQ9QN2KS/pQBcSEqMRsf76eEzTz/4xJ133rI3rbWu3XjnLU88+PQZrS4qvPzoo8unz7yV/rnfefHojcVgL63feuHxB2685dq01lrXrrrxkgcef+EtM+Add9y4N611+vJbP3+jUlpFN2qtlPrKo23bFy7XWmv9/qtuKTzywmmt9Vunn3j08zKP0kr6xU4RPhGt1FV33Hh5Wmtd23u5evHtt8/qrmu3Hn3xv/5cOuZ1cLx6ACYSSYmR+dG0Vkpr3/d9f23tGXXvTT9bFL/wDfXM2pr/vs888Ecffv3ondf/bPHyW774wKk3g738/uMPfsMz/f7FF570vvHg4/2NAat79khZvnCJ0jqm8awBA9734TvnHnzqlP/mC48+cueH91+4sQCtXVOETsTXWqUvvPDssz6r+4bo7hGS/pYCcOGJHowm/gJo41fotVKFwn71mS/+/deu+pmzOhb2f/J393/yd98evPin//7f/OrR9/3lne+3ew2efuyJz/3o7/+j6TV47Fcvfuzp3/rw9XOFwn71N4N1reeUUoPB60pVtY5s1NaAIdX9hwq//PQLl3h/87mPfm2j8t3y2ClCJ9J+feN1sPoX7e4bYl6HyFfV/bIDSBDXlBhZ5Dttvn/hRZeo9ltvaq39xSsPXfPH9z74d+ta+/3nv3Hg0i893l9/4kuX/tsHX39L+xfuqVarhUI6fXavM49998lD11x24U/H3HPldYce+u5jZ3xdveb26+77ve++0Pf99dM/uPc+pbX2F6++/br7fu/o8+ta908/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";
-                          alert(apiInstance.addEvidence(20,result,DataFormat.IMAGE_JPEG,BioType.PHOTO_SIGNER_IDENTITY_CARD_BACK,0));
-                      }
-
-                  function testSaveBusiness(){
-
-                      var encKey = "334324afa";
-                      var encData = apiInstance.saveBusiness(encKey);
-
-                      var res = document.getElementById('result');
-                      res.value = encData;
-
                   }
 
-                  function testRestoreBusiness(){
-
-                      var callback = function(context_id,context_type,val)
-                      {
-                          if(context_type == CALLBACK_TYPE_START_RECORDING || context_type == CALLBACK_TYPE_STOP_RECORDING)
-                          {
-                              return;
-                          }
-
-                          if(context_type == CALLBACK_TYPE_SIGNATURE)
-                              {
-                                  //签名回显
-                                  document.getElementById("xss_20").src = "data:image/png;base64," + val;
-                                  // document.getElementById("xss_21").src = "data:image/png;base64," + val;
-                              }
-                              else if(context_type == CALLBACK_TYPE_ON_PICTURE_TAKEN)
-                              {
-                                  document.getElementById("preview").src = "data:image/png;base64," + val;
-                              }else if(context_type == CALLBACK_TYPE_ON_MEDIA_DATA)
-                              {
-                                  var audio = document.createElement("audio");
-                                  if (audio != null && audio.canPlayType && audio.canPlayType("audio/mpeg"))
-                                  {
-                                      audio.src = "data:image/gif;base64," + val;
-                                      audio.play();
-                                  }
-                              }
-
-                              setAlertTitle();
-                              // alert("收到浏览器回调：" + "context_id：" + context_id + " context_type：" + context_type + " value：" + val);
-                          };//测试回调，将回调数据显示
+                  setAlertTitle();
+              };//测试回调，将回调数据显示
 
 
-                          var apiInstance = new AnySignApi();
-                        //  var channel = "999999";//渠道号，由信手书提供，请咨询项目经理
+              var apiInstance = new AnySignApi();
 
-                          //初始化签名接口
-                          res = apiInstance.initAnySignApi(callback,"1243");
+              //初始化签名接口
+              res = apiInstance.initAnySignApi(callback,"1243");
 
-                          if(!res){
-                              alert("init error");
-                          }else{
-                          	alert("init success");
-                          }
+              if(!res){
+                  alert("init error");
+              }else{
+                alert("init success");
+              }
 
-                          var encData = document.getElementById('result').value;
-                          var desKey = "334324afa";
-                          var res = apiInstance.restoreBusiness(encData,desKey);
-
-
-                          if(res){
-                              alert("恢复数据成功");
-                          }else{
-                              alert("恢复数据失败");
-                          }
+              var encData = document.getElementById('result').value;
+              var desKey = "334324afa";
+              var res = apiInstance.restoreBusiness(encData,desKey);
 
 
-                      }
+              if(res){
+                  alert("恢复数据成功");
+              }else{
+                  alert("恢复数据失败");
+              }
+
+
+          }
     </script>
   </head>
 
@@ -815,8 +660,6 @@
           width="100%"
         >
           <span id="single_scroll_text"> </span>
-          <!-- <input id="single_scrollbar_up" type="button" class="button orange" value="" />
-        <input id="single_scrollbar_down" type="button" class="button orange" value="" /> -->
         </div>
 
         <div id="btnContainerOuter" width="100%">
