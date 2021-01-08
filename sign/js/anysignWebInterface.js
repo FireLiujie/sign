@@ -1,7 +1,6 @@
 /**
  * fixed by liujie 2019.9.20
  */
-
 document.write('<link href="css/canvas_css.css" rel="stylesheet">');
 document.write('<link href="css/sp.css" rel="stylesheet">');
 document.write(
